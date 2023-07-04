@@ -3,12 +3,18 @@ import { createSchema, createYoga } from 'graphql-yoga'
 import { createServer } from 'http'
 
 const database: any ={
-  users:[
+  users:[{
+    email:"apina"
+  }
    
 
 ]
 
 }
+
+
+
+
 
 const yoga = createYoga({
   schema: createSchema({
@@ -29,31 +35,46 @@ const yoga = createYoga({
         login(username: String!, password: String!): User
       }
     `,
-    resolvers: {
+   resolvers: {
       Mutation: {
         login: (root, args) =>{
           
-         
+         console.log(args)
+         console.log(database)
 
          const user = database.users.find(user => user.username === args.username && user.password === args.password )
         console.log(user)
          
-        if(user === null){
+        if(user == null){
+          
           throw new Error("user not found !")
+          
          }
           
          return user
          
         },
         register: (root, args) => {
-          const user ={
+          const newuser ={
             email:args.email,
             username:args.username,
             password:args.password
             
           };
-          console.log(user)
-          database.users.push(user)
+          const user = database.users.find(user => user.username === args.username || user.email === args.email)
+          
+
+          if(user == null){
+
+            database.users.push(newuser)
+
+
+          }else{
+            throw new Error("username or email is taken !")
+          }
+          
+         
+          
         } 
         
       }
