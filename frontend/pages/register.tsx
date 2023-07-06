@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { ApolloClient, InMemoryCache, ApolloProvider, gql, useMutation } from '@apollo/client';
+import { gql, useMutation } from '@apollo/client';
 
 
 
@@ -7,7 +7,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, gql, useMutation } from '@
 
 const UPDATE_REGISTER= gql`
   
-mutation UPDATE_REGISTER($email: String! ,$username:String!, $password: String!)  {
+mutation UPDATE_REGISTER($email: String!, $username:String!, $password: String!)  {
   register(email: $email, username: $username, password: $password) {
     username
   }
@@ -55,6 +55,7 @@ export default function Register() {
       console.error(error);
     });
   }
+
 
   
   if (loading) return 'Submitting...';
