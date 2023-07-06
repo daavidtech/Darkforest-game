@@ -3,6 +3,8 @@ import { createSchema, createYoga } from 'graphql-yoga'
 import { createServer } from 'http'
 const jwt = require('jsonwebtoken');
 
+const secretKey = 'yourSecretKey';
+
 const database: any ={
   users:[{
     
@@ -18,6 +20,26 @@ const database: any ={
 
 
 const yoga = createYoga({
+	context: req => {
+	 	const token = req.request.headers.get("authorization")
+		
+		let user
+
+		if (token) {
+			try {
+				const decoded = jwt.verify(token, secretKey)
+				console.log("decoded token", decoded)
+				user = decoded
+			} catch(err) {
+				console.log(err)
+			}
+		}
+
+		return {
+			user: user
+		}
+	},
+
   schema: createSchema({
     typeDefs: /* GraphQL */ `
       
@@ -25,18 +47,35 @@ const yoga = createYoga({
         email: String!
         username: String!
       }
+
+	  type Viewer {
+		user: User
+	  }
+
+      type LoginResponse {
+        token: String!
+        viewer: Viewer!
+      }
       
       type Query {
         email: String!
         username: String!
+		viewer: Viewer!
       }
       
       type Mutation {
         register(email: String!, username: String!, password: String!): User
-        login(username: String!, password: String!): User
+        login(username: String!, password: String!): LoginResponse!
       }
     `,
    resolvers: {
+	  Query: {
+		viewer: (root, args, ctx: any) => {
+			return {
+				user: ctx.user
+			}
+		}
+	  },
       Mutation: {
         login: (root, args) =>{
           
@@ -45,25 +84,17 @@ const yoga = createYoga({
 
          const user = database.users.find(user => user.username === args.username && user.password === args.password )
         console.log(user)
-         
-        const secretKey = 'yourSecretKey';
 
-        const token = jwt.sign(database, secretKey, { expiresIn: '1h' });
+        const token = jwt.sign(user, secretKey, { expiresIn: '1h' });
 
         console.log('Generated JWT token:', token);
-        
-        if(user == null){
-          
-          throw new Error("user not found !")
-          
-         }
-         try {
-          const decoded = jwt.verify(token, secretKey);
-          console.log('Decoded JWT token:', decoded);
-        } catch (error) {
-          console.error('Failed to verify JWT token:', error);
-        }
-         return user
+
+         return {
+			token: token,
+			viewer: {
+				user: user
+			}
+		 }
          
         },
         register: (root, args) => {
