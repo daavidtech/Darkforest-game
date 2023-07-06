@@ -38,6 +38,7 @@ export default function Login() {
   const handleLogin = (event) => {
     console.log(`Käyttäjätunnus: ${username}, Salasana: ${password}`);
     event.preventDefault();
+    
     login({
       variables:{
         username:username,
@@ -51,6 +52,7 @@ export default function Login() {
   };
   
   return (
+    
       <main >
         <div >
   

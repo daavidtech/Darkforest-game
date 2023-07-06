@@ -1,7 +1,7 @@
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
 import {Layout} from "./layout"
-import {client} from "./client"
+import {client} from "../src/client"
 
 
 

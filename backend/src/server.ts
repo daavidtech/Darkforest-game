@@ -1,10 +1,11 @@
 import { error } from 'console'
 import { createSchema, createYoga } from 'graphql-yoga'
 import { createServer } from 'http'
+const jwt = require('jsonwebtoken');
 
 const database: any ={
   users:[{
-    email:"apina"
+    
   }
    
 
@@ -45,12 +46,23 @@ const yoga = createYoga({
          const user = database.users.find(user => user.username === args.username && user.password === args.password )
         console.log(user)
          
+        const secretKey = 'yourSecretKey';
+
+        const token = jwt.sign(database, secretKey, { expiresIn: '1h' });
+
+        console.log('Generated JWT token:', token);
+        
         if(user == null){
           
           throw new Error("user not found !")
           
          }
-          
+         try {
+          const decoded = jwt.verify(token, secretKey);
+          console.log('Decoded JWT token:', decoded);
+        } catch (error) {
+          console.error('Failed to verify JWT token:', error);
+        }
          return user
          
         },
@@ -62,7 +74,7 @@ const yoga = createYoga({
             
           };
           const user = database.users.find(user => user.username === args.username || user.email === args.email)
-          
+         
 
           if(user == null){
 
