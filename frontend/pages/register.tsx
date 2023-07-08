@@ -62,11 +62,7 @@ export default function Register() {
   if (error) return `username or email taken! ${error.message}`;
 
  
- 
- 
 
-
-  
  
   return (
    
