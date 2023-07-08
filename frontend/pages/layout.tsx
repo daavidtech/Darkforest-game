@@ -1,19 +1,48 @@
 import React from "react"
 
+import style from  '../styles/Home.module.css';
+import { gql, useMutation, useQuery } from "@apollo/client";
+
+
+const VIEWER_QUERY = gql`
+query{
+    viewer{
+        user{
+            username
+        }
+    }
+}
+`
+;
+
+
+
+
 export const Layout = ({ children }) => {
+    const {loading, error, data} = useQuery(VIEWER_QUERY);
+    if(loading) return 'loading'
+    if (error) return `Error! ${error.message}`;
+
+    console.log(data.viewer.user.username)
+   const user  = data.viewer.user.username
+    
+
+
     return (
-        <div>
+        <div >
             
             
-            <nav style={{
-                    fontSize: 60
-                }}>
-                <a href="/" >Home</a>
+            <nav className={style.nav}
+                    
+                >
+                <a href="/home">Home</a>
                 
                 
-                <a href="/register" >Register</a>
+                <a href="/register">Register</a>
                 
                 <a href="/sign">sign</a>
+               
+                <a href="0">User:{user}</a>
             </nav>
             {children}
             

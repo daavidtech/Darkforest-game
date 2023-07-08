@@ -7,7 +7,13 @@ const LOG_IN= gql`
   
 mutation LOG_IN($username:String!, $password: String!)  {
   login(username: $username, password: $password) {
-    username
+    token
+    viewer{
+      user{
+        username
+      }
+
+    }
   }
 }
 `;
@@ -39,16 +45,28 @@ export default function Login() {
     console.log(`Käyttäjätunnus: ${username}, Salasana: ${password}`);
     event.preventDefault();
     
-    login({
+   login({
       variables:{
         username:username,
         password:password
       }
+      
     }).catch(error => {
       
       console.error(error);
-    });
-   
+    }).then (response => {
+      
+      const token = response.data.login.token
+     
+      
+      
+      console.log(token)
+      
+
+      localStorage.setItem("token", token)
+    
+    })
+    
   };
   
   return (

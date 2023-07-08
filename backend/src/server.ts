@@ -22,16 +22,21 @@ const database: any ={
 const yoga = createYoga({
 	context: req => {
 	 	const token = req.request.headers.get("authorization")
-		
+		const tokenArray = token.split(" ");
+    const actualToken = tokenArray[1];
 		let user
+    console.log(actualToken)
+    console.log("apina")
 
-		if (token) {
+
+
+		if (actualToken) {
 			try {
-				const decoded = jwt.verify(token, secretKey)
+				const decoded = jwt.verify(actualToken, secretKey)
 				console.log("decoded token", decoded)
 				user = decoded
 			} catch(err) {
-				console.log(err)
+				console.log("eeeeeeee",err)
 			}
 		}
 
@@ -44,13 +49,14 @@ const yoga = createYoga({
     typeDefs: /* GraphQL */ `
       
       type User {
+        id: String!
         email: String!
         username: String!
       }
 
-	  type Viewer {
-		user: User
-	  }
+	    type Viewer {
+		  user: User
+	    }
 
       type LoginResponse {
         token: String!
@@ -60,13 +66,14 @@ const yoga = createYoga({
       type Query {
         email: String!
         username: String!
-		viewer: Viewer!
+		    viewer: Viewer! 
       }
       
       type Mutation {
         register(email: String!, username: String!, password: String!): User
         login(username: String!, password: String!): LoginResponse!
       }
+     
     `,
    resolvers: {
 	  Query: {
@@ -90,8 +97,8 @@ const yoga = createYoga({
         console.log('Generated JWT token:', token);
 
          return {
-			token: token,
-			viewer: {
+			  token: token,
+			  viewer: {
 				user: user
 			}
 		 }
@@ -99,6 +106,7 @@ const yoga = createYoga({
         },
         register: (root, args) => {
           const newuser ={
+            id: database.users.length + 1,
             email:args.email,
             username:args.username,
             password:args.password
