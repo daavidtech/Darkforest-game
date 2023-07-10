@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: salasana
+      POSTGRES_USER: käyttäjänimi
+      POSTGRES_DB: tietokannan_nimi
+    ports:
+     - 5432:5432
+    volumes:
+     - ./data:/var/lib/postgresql/data

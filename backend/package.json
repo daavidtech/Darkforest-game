@@ -7,9 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./dist/server.js",
     "build": "tsc -p ./tsconfig.json",
-    "watch": "tsc -p ./tsconfig.json -w",
-	"prisma-migrate": "prisma migrate dev",
-	"prisma-generate": "prisma generate"
+    "watch": "tsc -p ./tsconfig.json -w"
   },
   "author": "",
   "license": "ISC",
