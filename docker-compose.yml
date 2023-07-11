@@ -4,9 +4,9 @@ services:
     image: postgres:latest
     restart: always
     environment:
-      POSTGRES_PASSWORD: salasana
-      POSTGRES_USER: käyttäjänimi
-      POSTGRES_DB: tietokannan_nimi
+      POSTGRES_USER: apina  
+      POSTGRES_PASSWORD: mies 
+      POSTGRES_DB: darkforest
     ports:
      - 5432:5432
     volumes:
