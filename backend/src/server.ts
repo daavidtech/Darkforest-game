@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import { error } from 'console'
 import { createSchema, createYoga } from 'graphql-yoga'
 import { createServer } from 'http'
@@ -16,11 +17,15 @@ const database: any ={
 }
 
 
+const prisma = new PrismaClient()
 
-
+type Context = {
+	prisma: PrismaClient
+	user: any
+}
 
 const yoga = createYoga({
-	context: req => {
+	context: (req): Context => {
 	 	const token = req.request.headers.get("authorization")
 		const tokenArray = token.split(" ");
     const actualToken = tokenArray[1];
@@ -41,7 +46,8 @@ const yoga = createYoga({
 		}
 
 		return {
-			user: user
+			user: user,
+			prisma: prisma
 		}
 	},
 
@@ -81,6 +87,13 @@ const yoga = createYoga({
 			return {
 				user: ctx.user
 			}
+		},
+		user: (root, args, ctx: Context) => {
+			return ctx.prisma.user.findFirst({
+				where: {
+					id: args.userId
+				}
+			})
 		}
 	  },
       Mutation: {
