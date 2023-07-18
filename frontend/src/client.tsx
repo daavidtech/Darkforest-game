@@ -11,6 +11,7 @@ const getToken = () => {
 };
 const authLink = setContext((_, { headers }) => {
 	const token = getToken()
+	console.log("lähetys" ,token)
 
 	return {
 		headers: {
