@@ -180,7 +180,9 @@ const yoga = createYoga({
 
 					console.log('New user created:', newUser);
 
-					return {}
+					return {
+						viewer: {}
+					}
 				}
 
 			}
