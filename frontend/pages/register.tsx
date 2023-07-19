@@ -9,9 +9,14 @@ const UPDATE_REGISTER= gql`
   
 mutation UPDATE_REGISTER($email: String!, $username:String!, $password: String!)  {
   register(email: $email, username: $username, password: $password) {
-    username
+    viewer{
+		user{
+		  username
+		}
+  
+	  }
+	}
   }
-}
 `;
 
 
