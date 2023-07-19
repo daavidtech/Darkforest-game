@@ -5,7 +5,6 @@ import { createServer } from 'http'
 import { hash, compare } from "bcrypt"
 
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 
 const saltRounds = 10;
 const myPlaintextPassword = 's0/\/\P4$$w0rD';
@@ -43,8 +42,8 @@ const yoga = createYoga({
 		const tokenArray = token.split(" ");
 		const actualToken = tokenArray[1];
 		let user
-		
-		
+
+
 
 		if (actualToken) {
 			try {
@@ -63,7 +62,7 @@ const yoga = createYoga({
 	},
 	schema: createSchema({
 		typeDefs: /* GraphQL */ `
-      
+	  
 		type User {
 			id: String!
 			email: String!
@@ -78,6 +77,10 @@ const yoga = createYoga({
 			token: String!
 			viewer: Viewer!
 		}
+
+		type RegisterResponse {
+			viewer: Viewer!
+		}
 		
 		type Query {
 			email: String!
@@ -87,11 +90,16 @@ const yoga = createYoga({
 		}
 		
 		type Mutation {
-			register(email: String!, username: String!, password: String!): User
+			register(email: String!, username: String!, password: String!): RegisterResponse
 			login(username: String!, password: String!): LoginResponse!
 		}
-     	`,
+	 	`,
 		resolvers: {
+			Viewer: {
+				user: (root, args, ctx: Context) => {
+					return ctx.user
+				}
+			},
 			Query: {
 				viewer: (root, args, ctx: any) => {
 					return {
@@ -102,7 +110,7 @@ const yoga = createYoga({
 					return ctx.prisma.user.findFirst({
 						where: {
 							id: args.userId
-							
+
 						}
 					})
 				}
@@ -111,12 +119,12 @@ const yoga = createYoga({
 				login: async (root, args, ctx: Context) => {
 
 					console.log(args)
-					
+
 
 					const user = await ctx.prisma.user.findFirst({
 						where: {
 							username: args.username,
-							
+
 						}
 					})
 
@@ -124,9 +132,9 @@ const yoga = createYoga({
 						throw new Error('No such user found')
 					}
 
-					console.log("salasana",user.passwordHash)
+					console.log("salasana", user.passwordHash)
 					console.log("syötetty ", args.password)
-			
+
 
 					if (await compare(args.password, user.passwordHash) === false {
 						throw new Error('Invalid password')
@@ -146,40 +154,34 @@ const yoga = createYoga({
 					}
 
 				},
-				register: async (root, args) => {
-					const existingUser = await prisma.user.findFirst({
-					  where: {
-						OR: [
-						  { username: args.username },
-						  { email: args.email },
-						],
-					  },
+				register: async (root, args, ctx: Context) => {
+					const existingUser = await ctx.prisma.user.findFirst({
+						where: {
+							OR: [
+								{ username: args.username },
+								{ email: args.email },
+							],
+						},
 					});
-				  
-					console.log(existingUser)
-					bcrypt.genSalt(saltRounds, function(err, salt) {
-						bcrypt.hash(args.password, salt, async function(err, hash) {
-							if (existingUser === null) {
-								
-								const newUser = await prisma.user.create({
-								  data: {
-									username: args.username,
-									email: args.email,
-									passwordHash: hash,
-								  },
-								});
-							
-								console.log('New user created:', newUser);
-							  
-							  
-							  } else {
-								throw new Error('Username or email is taken!');
-							  }
-						});
+
+					if (existingUser) {
+						throw new Error("User already found from database")
+					}
+
+					const passwordHash = await hash(args.password, saltRounds)
+
+					const newUser = await ctx.prisma.user.create({
+						data: {
+							username: args.username,
+							email: args.email,
+							passwordHash: passwordHash,
+						},
 					});
-					
-					
-				  }
+
+					console.log('New user created:', newUser);
+
+					return {}
+				}
 
 			}
 		}
