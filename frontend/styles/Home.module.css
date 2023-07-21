@@ -1,5 +1,58 @@
 
+.resourceslist {
+	display: inline-block;
+	background-image: url('./img/wood.png');
+	border: 1px solid #240b0b;
+	border-radius: 5px;
+	padding: 20px;
+	width: 200px;
+	height: 500px;
+	float: left;
 
+	
+  }
+  
+.setlement{
+	
+	background-image: url('./img/backgrond.png');
+	border: 1px solid #240b0b;
+	border-radius: 5px;
+	padding: 20px;
+	width:800px;
+	height: 500px;
+	text-align: center;
+	display: inline-block;
+	float: left;
+   
+}
+
+
+
+
+  .h2 {
+	text-align: center;
+	margin-bottom: 20px;
+	font-size: 20px;
+	color: #333;
+  }
+  
+  .ul {
+
+	list-style: none;
+	padding: 0;
+	margin: 0;
+  }
+  
+  .li {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+	font-size: 16px;
+	color: #333;
+  }
+
+ 
 
 .header {
   height: 20px;
