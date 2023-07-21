@@ -21,6 +21,13 @@
   font: 400 16px/26px 'DIN Next W01',Helvetica,Arial,sans-serif;
 }
 
+.gamenav{
+	background-color: red;
+	display: flex;
+	justify-content: space-evenly;
+	font-size: 100%;
+	font: 400 16px/26px 'DIN Next W01',Helvetica,Arial,sans-serif;
+}
 
 
 .nav ul{

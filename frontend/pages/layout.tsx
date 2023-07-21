@@ -23,14 +23,9 @@ export const Layout = ({ children }) => {
     if(loading) return 'loading'
     if (error) return `Error! ${error.message}`;
 
-    console.log(data.viewer.user.username)
-   var user  = data.viewer.user.username
-    
-   if (user === null){
-    user = "anonyymimies"
-   }
-
-
+    var user = "anonyymimies"
+  
+   
     return (
         <div >
             
