@@ -3,6 +3,8 @@ import { error } from 'console'
 import { createSchema, createYoga } from 'graphql-yoga'
 import { createServer } from 'http'
 import { hash, compare } from "bcrypt"
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const jwt = require('jsonwebtoken');
 
@@ -34,24 +36,26 @@ type Context = {
 }
 
 
-
+const typedef = readFileSync(join(__dirname, "../gql-schema.gql"), { encoding: "utf-8" })
 
 const yoga = createYoga({
 	context: (req): Context => {
 		const token = req.request.headers.get("authorization")
-		const tokenArray = token.split(" ");
-		const actualToken = tokenArray[1];
+		
 		let user
 
+		if (token) {
+			const tokenArray = token.split(" ");
+			const actualToken = tokenArray[1];
 
-
-		if (actualToken) {
-			try {
-				const decoded = jwt.verify(actualToken, secretKey)
-				console.log("decoded token", decoded)
-				user = decoded
-			} catch (err) {
-				console.log("eeeeeeee", err)
+			if (actualToken) {
+				try {
+					const decoded = jwt.verify(actualToken, secretKey)
+					console.log("decoded token", decoded)
+					user = decoded
+				} catch (err) {
+					console.log("token decode error", err)
+				}
 			}
 		}
 
@@ -61,39 +65,7 @@ const yoga = createYoga({
 		}
 	},
 	schema: createSchema({
-		typeDefs: /* GraphQL */ `
-	  
-		type User {
-			id: String!
-			email: String!
-			username: String!
-		}
-
-		type Viewer {
-			user: User
-		}
-
-		type LoginResponse {
-			token: String!
-			viewer: Viewer!
-		}
-
-		type RegisterResponse {
-			viewer: Viewer!
-		}
-		
-		type Query {
-			email: String!
-			username: String!
-			viewer: Viewer! 
-			user: User!
-		}
-		
-		type Mutation {
-			register(email: String!, username: String!, password: String!): RegisterResponse
-			login(username: String!, password: String!): LoginResponse!
-		}
-	 	`,
+		typeDefs: typedef,
 		resolvers: {
 			Viewer: {
 				user: (root, args, ctx: Context) => {
@@ -136,7 +108,7 @@ const yoga = createYoga({
 					console.log("syötetty ", args.password)
 
 
-					if (await compare(args.password, user.passwordHash) === false {
+					if (await compare(args.password, user.passwordHash) === false) {
 						throw new Error('Invalid password')
 					};
 
