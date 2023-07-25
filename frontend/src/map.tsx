@@ -1,17 +1,55 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 
 
 export const Map = (prosps: {
+	active: boolean
+	rowsCount: number
+	columnsCount: number
 	buildings: any[]
 	activeBuilding: any[]
 	onBuildingSet: (p: any) => void
 }) => {
-	const currentCoordinate = useState({ x: 0, y: 0 })
+	const [currCord, setCurrCord] = useState<
+	{ x: null | number, y: null | number}>({ x: null, y: null })
+
+	const ref = useRef<HTMLDivElement>()
 
 	useEffect(() => {
+		const left = ref.current?.offsetLeft ?? 0
+		const top = ref.current?.offsetTop ?? 0
+
 		function onMouseMove(e: MouseEvent) {
-		
+			const clientX = e.clientX
+			const clientY = e.clientY
+
+			let containerX = clientX - left
+			let containerY = clientY - top
+
+			const containerWidth = ref.current?.clientWidth ?? 0
+			const containerHeight = ref.current?.clientHeight ?? 0
+
+			let x = null
+			let y = null
+
+			if (containerX > 0 && containerX < containerWidth) {
+				const oneWidth = containerWidth / prosps.columnsCount
+				x = Math.floor(containerX / oneWidth)
+			}
+
+			if (containerY > 0 && containerY < containerHeight) {
+				const oneHeight = containerHeight / prosps.rowsCount
+				y = Math.floor(containerY / oneHeight)
+			}
+
+			
+			if (currCord.x !== x || currCord.y !== y) {
+				console.log("mouse x: ",x, "mouse y:", y)
+				setCurrCord({
+					x: x,
+					y: y
+				})
+			}
 		}
 
 		window.addEventListener("mousemove", onMouseMove)
@@ -19,15 +57,28 @@ export const Map = (prosps: {
 		return () => {
 			window.removeEventListener("mousemove", onMouseMove)
 		}
-	}, [currentCoordinate])
+	}, [currCord, prosps.columnsCount, prosps.rowsCount, ref])
 
 	const rows = []
 
-	for (let i = 0; i < 5; i++) {
+	for (let i = 0; i < prosps.rowsCount; i++) {
 		const columns: any[] = []
 		
-		for (let j = 0; j < 5; j++) {
-			columns.push(<div style={{ width: "80px", height: "80px", textAlign: "center" }}>{i}:{j}</div>)
+		for (let j = 0; j < prosps.columnsCount; j++) {
+			columns.push(
+			<div style={{ 
+				height: "80px", 
+				flexGrow: 1, 
+				textAlign: "center",
+				backgroundColor: prosps.active && currCord.x === j && currCord.y == i ? "lightblue" : "white"
+			}}
+			onClick={() => {
+				prosps.onBuildingSet({
+					x: j,
+					y: i
+				})
+			}}
+			>{i}:{j}</div>)
 		}
 
 		rows.push(<div style={{
@@ -38,7 +89,7 @@ export const Map = (prosps: {
 		</div>)
 	}
 
-	return <div>
+	return <div ref={ref} style={{width: "300px", border: "solid 1px black" }}>
 		{rows}
 	</div>
 }
