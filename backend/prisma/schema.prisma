@@ -23,7 +23,6 @@ model Building {
   id           Int @id @default(autoincrement())
   buildingType Int @map("building_type")
   level        Int
-
   gold    Int?
   wood    Int?
   iron    Int?
