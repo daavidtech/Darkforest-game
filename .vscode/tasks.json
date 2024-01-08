@@ -1,0 +1,37 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run web dev",
+			"type": "shell",
+			"command": "bun dev",
+			"options": {
+				"cwd": "${workspaceFolder}/web"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Run server dev",
+			"type": "shell",
+			"command": "bun dev",
+			"options": {
+				"cwd": "${workspaceFolder}/server"
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"problemMatcher": []
+		}
+	]
+}
