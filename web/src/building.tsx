@@ -1,3 +1,4 @@
+import { useParams } from "react-router-dom"
 import "./building.css"
 import { Tooltip } from "./tooltip"
 
@@ -82,6 +83,16 @@ export const BuildingsList = (props: {
 			{buildings.map((b) => {
 				return <BuildingRow {...b} onClick={() => props.onClick(b)} />
 			})}
+		</div>
+	)
+}
+
+export const BuildingPage = () => {
+	const { buildingId } = useParams()
+
+	return (
+		<div>
+			Building {buildingId}
 		</div>
 	)
 }

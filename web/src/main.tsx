@@ -7,6 +7,7 @@ import { SiginPage } from './signin.tsx';
 import { RegisterPage } from './register.tsx';
 import { Navbar } from './navbar.tsx';
 import { ResourcesPage } from './resources.tsx';
+import { BuildingPage } from './building.tsx';
 
 const router = createBrowserRouter([
 	{
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
 			{
 				path: "/resources",
 				element: <ResourcesPage />
+			},
+			{
+				path: "/building/:buildingId",
+				element: <BuildingPage />
 			}
 		]
 	}
