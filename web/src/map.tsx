@@ -1,5 +1,6 @@
 
 import React, { Fragment, useEffect, useRef, useState } from "react"
+import { BuildingsList } from "./building"
 
 export const Map = (prosps: {
 	active: boolean
@@ -99,19 +100,22 @@ export const MapPage = () => {
 
 	return (
 		<Fragment>
-			<button onClick={() => setActive(!active)}>
-				Rakennus
-			</button>
-			<Map
-				active={active}
-				rowsCount={5}
-				columnsCount={5}
-				onBuildingSet={(p) => {
-					// DO something
-				}}
-				activeBuilding={[]}
-				buildings={[]}
-			/>
+			<div style={{ display: "flex" }}>
+				<BuildingsList />
+				<div>
+					<Map
+						active={active}
+						rowsCount={5}
+						columnsCount={5}
+						onBuildingSet={(p) => {
+							// DO something
+						}}
+						activeBuilding={[]}
+						buildings={[]}
+					/>
+				</div>
+			</div>
+			
 		</Fragment>
 	)
 }
