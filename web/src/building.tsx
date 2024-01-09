@@ -50,7 +50,9 @@ const buildings: BuildingDesc[] = [
 	}
 ]
 
-const BuildingRow = (props: BuildingDesc) => {
+const BuildingRow = (props: BuildingDesc & {
+	onClick: () => void
+}) => {
 	const tooltip = `${props.wood ? `Wood: ${props.wood}` : ""}
 ${props.iron ? `Iron: ${props.iron}` : ""}
 ${props.innovation ? `Innovation: ${props.innovation}` : ""}`
@@ -59,6 +61,7 @@ ${props.innovation ? `Innovation: ${props.innovation}` : ""}`
 		<div
 			draggable={true}
 			className="buildingRow"
+			onClick={props.onClick}
 			style={{ display: "flex", flexDirection: "column", border: "1px solid black" }}>
 			<Tooltip text={tooltip}>
 				<div style={{ display: "flex", flexDirection: "column" }}>
@@ -71,11 +74,13 @@ ${props.innovation ? `Innovation: ${props.innovation}` : ""}`
 	)
 }
 
-export const BuildingsList = () => {
+export const BuildingsList = (props: {
+	onClick: (building: BuildingDesc) => void
+}) => {
 	return (
 		<div style={{ backgroundColor: "white" }}>
 			{buildings.map((b) => {
-				return <BuildingRow {...b} />
+				return <BuildingRow {...b} onClick={() => props.onClick(b)} />
 			})}
 		</div>
 	)

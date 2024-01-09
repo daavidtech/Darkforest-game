@@ -1,9 +1,9 @@
 
 import React, { Fragment, useEffect, useRef, useState } from "react"
-import { BuildingsList } from "./building"
+import { BuildingDesc, BuildingsList } from "./building"
 
-export const Map = (prosps: {
-	active: boolean
+export const Map = (props: {
+	current: BuildingDesc | undefined
 	rowsCount: number
 	columnsCount: number
 	buildings: any[]
@@ -33,12 +33,12 @@ export const Map = (prosps: {
 			let y = null
 
 			if (containerX > 0 && containerX < containerWidth) {
-				const oneWidth = containerWidth / prosps.columnsCount
+				const oneWidth = containerWidth / props.columnsCount
 				x = Math.floor(containerX / oneWidth)
 			}
 
 			if (containerY > 0 && containerY < containerHeight) {
-				const oneHeight = containerHeight / prosps.rowsCount
+				const oneHeight = containerHeight / props.rowsCount
 				y = Math.floor(containerY / oneHeight)
 			}
 
@@ -57,23 +57,26 @@ export const Map = (prosps: {
 		return () => {
 			window.removeEventListener("mousemove", onMouseMove)
 		}
-	}, [currCord, prosps.columnsCount, prosps.rowsCount, ref])
+	}, [currCord, props.columnsCount, props.rowsCount, ref])
 
 	const rows = []
 
-	for (let i = 0; i < prosps.rowsCount; i++) {
+	for (let i = 0; i < props.rowsCount; i++) {
 		const columns: any[] = []
 		
-		for (let j = 0; j < prosps.columnsCount; j++) {
+		for (let j = 0; j < props.columnsCount; j++) {
+			const xActive = props.current ? currCord.x !== null && currCord.x >= j && currCord.x < j + props.current.width : undefined
+			const yActive = props.current ? currCord.y !== null && currCord.y >= i && currCord.y < i + props.current.height : undefined
+
 			columns.push(
 			<div style={{ 
 				height: "80px", 
 				flexGrow: 1, 
 				textAlign: "center",
-				backgroundColor: prosps.active && currCord.x === j && currCord.y == i ? "lightblue" : "white"
+				backgroundColor: xActive && yActive ? "lightblue" : "white"
 			}}
 			onClick={() => {
-				prosps.onBuildingSet({
+				props.onBuildingSet({
 					x: j,
 					y: i
 				})
@@ -95,20 +98,23 @@ export const Map = (prosps: {
 }
 
 export const MapPage = () => {
-	const [active, setActive] = useState(false)
+	const [current, setCurrent] = useState<BuildingDesc | undefined>(undefined)
 	const [buildings, setBuildings] = useState([])
 
 	return (
 		<Fragment>
 			<div style={{ display: "flex" }}>
-				<BuildingsList />
+				<BuildingsList onClick={d => {
+					console.log("set current: ", d)
+					setCurrent(d)
+				}} />
 				<div>
 					<Map
-						active={active}
+						current={current}
 						rowsCount={5}
 						columnsCount={5}
 						onBuildingSet={(p) => {
-							// DO something
+							setCurrent(p)
 						}}
 						activeBuilding={[]}
 						buildings={[]}
