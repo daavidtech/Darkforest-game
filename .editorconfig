@@ -3,3 +3,7 @@
 end_of_line = lf
 tab_width = 4
 indent_style = tab
+
+[.yaml]
+indent_size = 2
+indent_style = space
