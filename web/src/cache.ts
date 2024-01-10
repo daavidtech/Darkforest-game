@@ -1,23 +1,15 @@
 import { useEffect, useState } from "react"
-
-export type Building = {
-	buildingId?: number
-	x: number
-	y: number
-	width: number
-	height: number
-	level: number
-	name: string
-	contructionDoneAt: Date
-}
+import { MapGrid } from "../../types"
 
 export const cache = {
 	newBuildingId: 1,
 	mapSize: 5,
-    mapBuildings: new Map<number, Building[]>()
+	maps: new Map<number, MapGrid>(),
 }
 
-cache.mapBuildings.set(1, [])
+cache.maps.set(1, {
+	buildings: []
+})
 
 const listeners = new Set<() => void>()
 

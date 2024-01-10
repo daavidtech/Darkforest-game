@@ -8,6 +8,9 @@ import { RegisterPage } from './register.tsx';
 import { Navbar } from './navbar.tsx';
 import { ResourcesPage } from './resources.tsx';
 import { BuildingPage } from './building.tsx';
+import { startProduction } from './production.ts';
+
+startProduction()
 
 const router = createBrowserRouter([
 	{

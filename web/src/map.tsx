@@ -1,10 +1,12 @@
 
 import { Fragment, useEffect, useRef, useState } from "react"
 import { BuildingDesc, BuildingsList } from "./building"
-import { Building, cache, notifyChanges, useCache } from "./cache"
+import { cache, notifyChanges, useCache } from "./cache"
 import { DateTime } from "luxon" 
 import { useNavigate } from "react-router-dom"
 import { BuildingProgresses } from "./progress"
+import { ResourceTabs } from "./resources"
+import { Building } from "../../types"
 
 export const Map = (props: {
 	current: BuildingDesc | undefined
@@ -143,13 +145,14 @@ export const MapPage = () => {
 	const [current, setCurrent] = useState<BuildingDesc | undefined>(undefined)
 	const { buildings, size } = useCache(m => {
 		return {
-			buildings: m.mapBuildings.get(1),
+			buildings: m.maps.get(1).buildings,
 			size: m.mapSize
 		}
 	})
 
 	return (
 		<Fragment>
+			<ResourceTabs />
 			<div style={{ display: "flex" }}>
 				<BuildingsList onClick={d => { setCurrent(d) }} />
 				<div>
@@ -163,7 +166,7 @@ export const MapPage = () => {
 						rowsCount={size}
 						columnsCount={size}
 						onBuildingSet={(p) => {
-							const map = cache.mapBuildings.get(1)
+							const map = cache.maps.get(1)
 
 							if (!map) {
 								return
@@ -173,13 +176,16 @@ export const MapPage = () => {
 								return
 							}
 
-							map.push({
+							map.buildings.push({
 								buildingId: cache.newBuildingId++,
 								x: p.x,
 								y: p.y,
 								width: current.width,
 								height: current.height,
 								name: current.title,
+								woodProduction: current.woodProduction,
+								grainProduction: current.grainProduction,
+								ironProduction: current.ironProduction,
 								contructionDoneAt: DateTime.now().plus({ seconds: current.constructionTime }).toJSDate(),
 								level: 1
 							})

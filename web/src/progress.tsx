@@ -1,21 +1,19 @@
 import { DateTime } from "luxon"
-import { Building, cache, notifyChanges, useCache } from "./cache"
+import { cache, notifyChanges, useCache } from "./cache"
 import { useEffect, useState } from "react"
+import { Building } from "../../types"
 
 const BuildingProgress = (props: { 
 	building: Building
+	onReady: () => void
 	onCancel: () => void
 }) => {
-	const [progress, setProgress] = useState(0)
 	const [timeLeft, setTimeLeft] = useState("")
 
 	useEffect(() => {
 		const interval = setInterval(() => {
 			const now = DateTime.now()
 			const diff = props.building.contructionDoneAt.getTime() - now.toJSDate().getTime()
-			const total = now.plus({ minutes: 30 }).toJSDate().getTime() - now.toJSDate().getTime()
-			const percent = Math.floor((diff / total) * 100)
-			setProgress(percent)
 
 			let minutes: number | string = Math.floor(diff / 1000 / 60)
 			let seconds: number | string = Math.floor(diff / 1000 % 60)
@@ -54,8 +52,8 @@ export const BuildingProgresses = () => {
 			building: Building	
 		}[] = []
 
-		for (const [mapId,mapBuildings] of m.mapBuildings) {
-			for (const building of mapBuildings) {
+		for (const [mapId, planet] of m.maps) {
+			for (const building of planet.buildings) {
 				if (building.contructionDoneAt) {
 					buildings.push({
 						mapId,
@@ -75,14 +73,18 @@ export const BuildingProgresses = () => {
 		<div style={{ padding: "10px" }}>
 			{buildings.map((b, i) => {
 				return <BuildingProgress key={i} building={b.building}
+					onReady={() => {
+						b.building.contructionDoneAt = undefined
+						notifyChanges()
+					}}
 					onCancel={() => {
-						const mapBuildings = cache.mapBuildings.get(b.mapId)
+						const map = cache.maps.get(b.mapId)
 
-						if (mapBuildings) {
-							const index = mapBuildings.findIndex(p => p.buildingId === b.building.buildingId)
+						if (map) {
+							const index = map.buildings.findIndex(p => p.buildingId === b.building.buildingId)
 
 							if (index !== -1) {
-								mapBuildings.splice(index, 1)
+								map.buildings.splice(index, 1)
 							}
 						}
 

@@ -2,23 +2,34 @@ import { useParams } from "react-router-dom"
 import "./building.css"
 import { Tooltip } from "./tooltip"
 
+export type BuildingType = "clayhouse" |
+	"storagepit" |
+	"farm" |
+	"school" |
+	"barrack" |
+	"ironmine" |
+	"woodcutter"
+
 export type BuildingDesc = {
 	title: string
+	type: BuildingType
 	img: string
 	width: number
 	height: number
 	woodCost?: number
 	ironCost?: number
 	clayCost?: number
-	woodPerSecond?: number
-	ironPerSecond?: number
+	woodProduction?: number
+	ironProduction?: number
 	innovation?: number
 	constructionTime: number
+	grainProduction?: number
 }
 
 const buildings: BuildingDesc[] = [
 	{
 		title: "Clay House",
+		type: "clayhouse",
 		img: "/savimaja.png",
 		width: 1,
 		height: 1,
@@ -26,6 +37,7 @@ const buildings: BuildingDesc[] = [
 	},
 	{
 		title: "Storage Pit",
+		type: "storagepit",
 		img: "/storagepit.png",
 		width: 1,
 		height: 1,
@@ -33,13 +45,16 @@ const buildings: BuildingDesc[] = [
 	},
 	{
 		title: "Farm",
+		type: "farm",
 		img: "/farm_1.png",
 		width: 1,
 		height: 1,
-		constructionTime: 150
+		constructionTime: 150,
+		grainProduction: 60
 	},
 	{
 		title: "School",
+		type: "school",
 		img: "/school.png",
 		width: 2,
 		height: 2,
@@ -50,6 +65,7 @@ const buildings: BuildingDesc[] = [
 	},
 	{
 		title: "Barrack",
+		type: "barrack",
 		img: "/barrack_1.png",
 		width: 3,
 		height: 2,
@@ -57,6 +73,24 @@ const buildings: BuildingDesc[] = [
 		ironCost: 50,
 		innovation: 10,
 		constructionTime: 1000
+	},
+	{
+		title: "Iron Mine",
+		type: "ironmine",
+		img: "/ironmine.png",
+		width: 4,
+		height: 4,
+		constructionTime: 1000,
+		ironProduction: 10
+	},
+	{
+		title: "Woodcutter",
+		type: "woodcutter",
+		img: "/woodcut.png",
+		width: 3,
+		height: 2,
+		constructionTime: 200,
+		woodProduction: 5
 	}
 ]
 
