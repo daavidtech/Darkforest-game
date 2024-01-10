@@ -7,8 +7,11 @@ export type BuildingDesc = {
 	img: string
 	width: number
 	height: number
-	wood?: number
-	iron?: number
+	woodCost?: number
+	ironCost?: number
+	clayCost?: number
+	woodPerSecond?: number
+	ironPerSecond?: number
 	innovation?: number
 	constructionTime: number
 }
@@ -40,8 +43,8 @@ const buildings: BuildingDesc[] = [
 		img: "/school.png",
 		width: 2,
 		height: 2,
-		wood: 100,
-		iron: 50,
+		woodCost: 100,
+		ironCost: 50,
 		innovation: 10,
 		constructionTime: 300
 	},
@@ -50,8 +53,8 @@ const buildings: BuildingDesc[] = [
 		img: "/barrack_1.png",
 		width: 3,
 		height: 2,
-		wood: 100,
-		iron: 50,
+		woodCost: 100,
+		ironCost: 50,
 		innovation: 10,
 		constructionTime: 1000
 	}
@@ -61,8 +64,8 @@ const BuildingRow = (props: BuildingDesc & {
 	onClick: () => void
 }) => {
 	const tooltip = `Time: ${props.constructionTime}s
-${props.wood ? `Wood: ${props.wood}` : ""}
-${props.iron ? `Iron: ${props.iron}` : ""}
+${props.woodCost ? `Wood: ${props.woodCost}` : ""}
+${props.ironCost ? `Iron: ${props.ironCost}` : ""}
 ${props.innovation ? `Innovation: ${props.innovation}` : ""}`
 
 	return (
