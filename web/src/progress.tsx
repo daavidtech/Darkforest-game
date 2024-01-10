@@ -17,8 +17,8 @@ const BuildingProgress = (props: {
 			const percent = Math.floor((diff / total) * 100)
 			setProgress(percent)
 
-			let minutes = Math.floor(diff / 1000 / 60)
-			let seconds = Math.floor(diff / 1000 % 60)
+			let minutes: number | string = Math.floor(diff / 1000 / 60)
+			let seconds: number | string = Math.floor(diff / 1000 % 60)
 
 			if (minutes < 10) {
 				minutes = "0" + minutes
