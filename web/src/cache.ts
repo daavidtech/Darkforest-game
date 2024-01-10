@@ -7,6 +7,7 @@ export type Building = {
 	width: number
 	height: number
 	level: number
+	name: string
 	contructionDoneAt: Date
 }
 

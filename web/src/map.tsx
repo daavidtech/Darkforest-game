@@ -4,6 +4,7 @@ import { BuildingDesc, BuildingsList } from "./building"
 import { Building, cache, notifyChanges, useCache } from "./cache"
 import { DateTime } from "luxon" 
 import { useNavigate } from "react-router-dom"
+import { BuildingProgresses } from "./progress"
 
 export const Map = (props: {
 	current: BuildingDesc | undefined
@@ -117,7 +118,8 @@ export const Map = (props: {
 				height: "80px", 
 				flexGrow: 1, 
 				textAlign: "center",
-				backgroundColor
+				backgroundColor,
+				cursor: "pointer"
 			}}
 			onClick={() => onClick(j, i)}>
 				{i}:{j}
@@ -177,17 +179,20 @@ export const MapPage = () => {
 								y: p.y,
 								width: current.width,
 								height: current.height,
-								contructionDoneAt: DateTime.now().plus({ minutes: 30 }).toJSDate(),
+								name: current.title,
+								contructionDoneAt: DateTime.now().plus({ seconds: current.constructionTime }).toJSDate(),
 								level: 1
 							})
+
+							notifyChanges()
 
 							setCurrent(undefined)
 						}}
 						buildings={buildings}
 					/>
 				</div>
+				<BuildingProgresses />
 			</div>
-			
 		</Fragment>
 	)
 }
