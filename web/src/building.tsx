@@ -131,12 +131,40 @@ export const BuildingsList = (props: {
 	)
 }
 
+const BuildingUnitRow = (props: {
+	name: string
+	currentCount: number
+	maxCount?: number
+	woodCost: number
+	ironCost: number
+}) => {
+	return (
+		<div style={{ display: "flex" }}>
+			<div>
+				<div>
+					{props.name}
+				</div>
+				<div style={{ display: "flex" }}>
+					<div>Wood: {props.woodCost}</div>
+					<div>Iron: {props.ironCost}</div>
+				</div>
+			</div>
+			<div>
+				<input type="text" />
+			</div>
+		</div>
+	)
+}
+
 export const BuildingPage = () => {
 	const { buildingId } = useParams()
 
 	return (
-		<div>
-			Building {buildingId}
+		<div style={{ backgroundColor: "white", maxWidth: "800px" }}>
+			<h2>Units</h2>
+			<BuildingUnitRow name="Spearman" currentCount={0} woodCost={10} ironCost={5} />
+			<BuildingUnitRow name="Archer" currentCount={0} woodCost={10} ironCost={5} />
+			<button>Train</button>
 		</div>
 	)
 }
