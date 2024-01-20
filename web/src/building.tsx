@@ -134,7 +134,7 @@ export const BuildingsList = (props: {
 const BuildingUnitRow = (props: {
 	name: string
 	currentCount: number
-	maxCount?: number
+	maxCount: number
 	woodCost: number
 	ironCost: number
 }) => {
@@ -152,6 +152,9 @@ const BuildingUnitRow = (props: {
 			<div>
 				<input type="text" />
 			</div>
+			<div>
+				<button>{props.maxCount}</button>
+			</div>
 		</div>
 	)
 }
@@ -162,8 +165,8 @@ export const BuildingPage = () => {
 	return (
 		<div style={{ backgroundColor: "white", maxWidth: "800px" }}>
 			<h2>Units</h2>
-			<BuildingUnitRow name="Spearman" currentCount={0} woodCost={10} ironCost={5} />
-			<BuildingUnitRow name="Archer" currentCount={0} woodCost={10} ironCost={5} />
+			<BuildingUnitRow name="Spearman" currentCount={0} woodCost={10} ironCost={5} maxCount={500} />
+			<BuildingUnitRow name="Archer" currentCount={0} woodCost={10} ironCost={5} maxCount={256} />
 			<button>Train</button>
 		</div>
 	)
