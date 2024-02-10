@@ -2,13 +2,18 @@
 
 ## Unit
 
-Unit construction takes some amount of resources and population. After construction these units have certain maintanence cost. Units are movable and can move by themself. Units can ride vehices which allows them to move faster.
+Unit construction takes some amount of resources and population. After construction these units have certain maintanence cost. Units are movable and can move by themself. One unit can be for example:
+- One kokobongo with glub. Which only require one population per unit.
+- Something like [https://en.wikipedia.org/wiki/Contubernium_(Roman_army_unit)](Contubernium) which has few soldiers and requires something around 8 population.
+- Tanks which might require around 4 population.
+- Battleship which might require 100 to 1000 population.
+- Big spachips tink of something like in starwars where they might be thousands to hundereds of thousands.
 
-## Vehicle
+Units have basic state and then they can be trained for more advanced roles like engineer or doctor. Upgrades to different units have various requirements like simple rifle squad require units with basic military training but something like battleship might require chefs, engineers, doctors... Some upgrades to units have some requirements like certain age or IQ level.
 
-Vehicles can be used for faster movement or other cababilities like more attack damage or faster building time. Vechicles are not independed and using them requires units with certain kind of training. One vehicle can move zero or more units.
+Units can have multiple upgrades but obviously it is costly and might not make sense. Upgrades like new education are not cancellable but things like riffle squat and be dismantled and units like tanks could give resources if dismantled but obviously less than was used to build them.
 
-
+## Unit
 
 ## Currency
 There is no single currency players can create their own or choose to use existing ones. Value of the currency is determined by the player based on how much there is it and population and exchange rates.
@@ -33,4 +38,6 @@ Building buildings require resources and workers. Also requires certain Technolo
 ## Units
 
 Building units require some resources and 
+
+
 
