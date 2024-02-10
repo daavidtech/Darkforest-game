@@ -27,8 +27,6 @@ Things that affect damage done to the enemy unit are:
 - Enemy unit defense stat which is different to different damage types
 - Attack speed
 
-## Unit
-
 ## Currency
 There is no single currency players can create their own or choose to use existing ones. Value of the currency is determined by the player based on how much there is it and population and exchange rates.
 
@@ -48,10 +46,6 @@ It would be fun if the game time would have realistic time but it would be just 
 ## Building
 
 Building buildings require resources and workers. Also requires certain Technology stage. Buildings may also require certain vehicles for building like building modern big building without any machines would be very slow.
-
-## Units
-
-Building units require some resources and 
 
 
 
