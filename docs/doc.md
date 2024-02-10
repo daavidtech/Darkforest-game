@@ -39,6 +39,8 @@ One mapgrid size could be 10 000 km2 so around 1 000 000 rectangles.
 
 With unit speed of 8 kmh it would take around 1400 hours to go through the whole map.
 
+Map can have different types of areas like sea or areas which have high natural resources like oil or other minerals.
+
 ## Speed
 
 It would be fun if the game time would have realistic time but it would be just speedup by x amount. However in real life difference between movent speed and building speed is quite high. For example if school building 8 month and the we would speed up time by 1000 then building this building would take few hours and going through the whole map would take 1 hour. 
@@ -46,6 +48,14 @@ It would be fun if the game time would have realistic time but it would be just 
 ## Building
 
 Building buildings require resources and workers. Also requires certain Technology stage. Buildings may also require certain vehicles for building like building modern big building without any machines would be very slow.
+
+Buidings have some dependecies like:
+- Resources like stone, metal....
+- Specialiced unit like teachers, engineers..
+- Innovation level
+- Building units
+
+Buildings can be upgraded but then thet might require more specialiced units, recources and higher maintanence cost.
 
 
 
