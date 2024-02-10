@@ -4,7 +4,7 @@
 
 Unit construction takes some amount of resources and population. After construction these units have certain maintanence cost. Units are movable and can move by themself. One unit can be for example:
 - One kokobongo with glub. Which only require one population per unit.
-- Something like [https://en.wikipedia.org/wiki/Contubernium_(Roman_army_unit)](Contubernium) which has few soldiers and requires something around 8 population.
+- Something like [Contubernium](https://en.wikipedia.org/wiki/Contubernium_(Roman_army_unit)) which has few soldiers and requires something around 8 population.
 - Tanks which might require around 4 population.
 - Battleship which might require 100 to 1000 population.
 - Big spachips tink of something like in starwars where they might be thousands to hundereds of thousands.
