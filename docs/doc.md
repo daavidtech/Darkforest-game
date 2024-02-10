@@ -13,6 +13,20 @@ Units have basic state and then they can be trained for more advanced roles like
 
 Units can have multiple upgrades but obviously it is costly and might not make sense. Upgrades like new education are not cancellable but things like riffle squat and be dismantled and units like tanks could give resources if dismantled but obviously less than was used to build them.
 
+## Battles
+
+Even though game speed is speed up considerably speed up time is relevant in the battles for example units have different attack ranges which means certain type of unit can attack other type units farther away. Units will respond automatically to attack by attacking it if they can see it. Basically it measn that with acher attacks swordman then it would be logical that swordman will run to the archer but some missile is launched from 50km or more away how could some simple riffle squad know how to attack enemy which they cant see.
+
+Battles are always onesided meaning that they are simulated from point of view of the attacker but both players are attackers if units are in attack range. Battle is cosidered to be started only when distance is less or equal than attack distance.
+
+### Damage
+
+Things that affect damage done to the enemy unit are:
+- Attack damage
+- Accuracy
+- Enemy unit defense stat which is different to different damage types
+- Attack speed
+
 ## Unit
 
 ## Currency
