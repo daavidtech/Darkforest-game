@@ -18,6 +18,7 @@ export const Map = (props: {
 	const navigate = useNavigate()
 
 	const [currCord, setCurrCord] = useState<{ x: null | number, y: null | number}>({ x: null, y: null })
+	const [leftUp, setLeftUp] = useState({ x: 0, y: 0 })
 
 	const ref = useRef<HTMLDivElement>()
 
@@ -88,10 +89,10 @@ export const Map = (props: {
 		props.onBuildingSet({x, y})
 	}
 
-	for (let i = 0; i < props.rowsCount; i++) {
+	for (let i = leftUp.y; i < leftUp.y + props.rowsCount; i++) {
 		const columns: any[] = []
 		
-		for (let j = 0; j < props.columnsCount; j++) {
+		for (let j = leftUp.x; j < leftUp.x + props.columnsCount; j++) {
 			let backgroundColor = "white"
 			const b = props.buildings.find(b => b.x <= j && j < b.x + b.width && b.y <= i && i < b.y + b.height)
 
@@ -124,7 +125,7 @@ export const Map = (props: {
 				cursor: "pointer"
 			}}
 			onClick={() => onClick(j, i)}>
-				{i}:{j}
+				{i%10_000}:{j%10_000}
 			</div>)
 		}
 
@@ -137,6 +138,18 @@ export const Map = (props: {
 	}
 
 	return <div ref={ref} style={{width: props.columnsCount * 60 + "px", border: "solid 1px black" }}>
+		<button>
+			Up
+		</button>
+		<button>
+			Down
+		</button>
+		<button onClick={() => { setLeftUp({ x: leftUp.x - 1 < 0 ? 10_000 - leftUp.x : leftUp.x - 1, y:leftUp.y }) }}>
+			Left
+		</button>
+		<button onClick={() => { setLeftUp({ x: leftUp.x + 1, y:leftUp.y }) }}>
+			Right
+		</button>
 		{rows}
 	</div>
 }
