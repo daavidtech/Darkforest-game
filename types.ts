@@ -12,11 +12,12 @@ type UnitMovement = {
 	target: Target
 }
 
-type Unit = {
+export type Unit = {
 	id: number
 	type: UnitType
 	health: number
 	attackDamage: number
+	attackRange: number
 }
 
 type UnitBlueprint = {
@@ -27,7 +28,7 @@ type UnitBlueprint = {
 	ironCost: number
 }
 
-type Vehicle = {
+export type Vehicle = {
 	type: VehicleType
 	carries: Unit[]
 	health: number
