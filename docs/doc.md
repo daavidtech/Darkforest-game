@@ -41,6 +41,12 @@ With unit speed of 8 kmh it would take around 1400 hours to go through the whole
 
 Map can have different types of areas like sea or areas which have high natural resources like oil or other minerals.
 
+One map grid presents one planet and there can be map grids with different sizes. Players can only leave their map grid when they develop required technology to do so.
+
+### Space
+
+Maybe space could be three dimensional map grid where structures need to be placed on three dimensions
+
 ## Speed
 
 It would be fun if the game time would have realistic time but it would be just speedup by x amount. However in real life difference between movent speed and building speed is quite high. For example if school building 8 month and the we would speed up time by 1000 then building this building would take few hours and going through the whole map would take 1 hour. 
