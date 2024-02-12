@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "144E588D-1EA1-4F9A-9B9D-1617E2749A8D"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5A899F37-619A-4127-976A-E14928605316"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Darkforest/ContentView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
+            landmarkName = "body"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "5A899F37-619A-4127-976A-E14928605316 - a8f72a2e6687d0fd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Darkforest.ContentView.body.getter : some"
+                  moduleName = "Darkforest"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jaska/koodia/others/Darkforest-game/ios/Darkforest/ContentView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "80"
+                  endingLineNumber = "80"
+                  offsetFromSymbolStart = "608">
+               </Location>
+               <Location
+                  uuid = "5A899F37-619A-4127-976A-E14928605316 - a8f72a2e6687d0fd"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Darkforest.ContentView.body.getter : some"
+                  moduleName = "Darkforest"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jaska/koodia/others/Darkforest-game/ios/Darkforest/ContentView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "80"
+                  endingLineNumber = "80"
+                  offsetFromSymbolStart = "640">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
