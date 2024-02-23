@@ -1,5 +1,7 @@
 # Darkforest-game
 
+[Game description](docs/doc.md)
+
 ## Development
 
 ### web
