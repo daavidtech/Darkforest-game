@@ -13,6 +13,14 @@ Units have basic state and then they can be trained for more advanced roles like
 
 Units can have multiple upgrades but obviously it is costly and might not make sense. Upgrades like new education are not cancellable but things like riffle squat and be dismantled and units like tanks could give resources if dismantled but obviously less than was used to build them.
 
+### Properties
+
+- Type of unit
+- Health of unit
+- Accuracy
+- Attack damage
+- Location either coordinates or building
+
 ## Battles
 
 Even though game speed is speed up considerably speed up time is relevant in the battles for example units have different attack ranges which means certain type of unit can attack other type units farther away. Units will respond automatically to attack by attacking it if they can see it. Basically it measn that with acher attacks swordman then it would be logical that swordman will run to the archer but some missile is launched from 50km or more away how could some simple riffle squad know how to attack enemy which they cant see.
@@ -63,6 +71,17 @@ Buidings have some dependecies like:
 
 Buildings can be upgraded but then thet might require more specialiced units, recources and higher maintanence cost.
 
+### Properties
+
+- Type of building
+- Owner of building
+- Health of building
+- Map and coordinates of building (how to handle space ?)
+- Shape of building. Basically it can have have any shape possible to make with map grid rectangles.
+- How much resources it produces.
+- How much resources it can store.
+- How many resources it stores.
+
 ### Resource production
 
 Buildings can have resource production rates for different resources. For example:
@@ -80,5 +99,7 @@ Buildings can have storage for resources. For example:
 - Warehouse can have storage for all resources and can be upgraded to have more storage. Used for long term storage.
 - Mine can have storage for metal but only limited amount not for long term storage.
 
+### Unit storage
 
+Buildings can store units like normal houses can store people and military base can store soldiers. Also units like tanks require more specialiced storage. Buildings have flags for each type of units it can store.
 
