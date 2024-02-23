@@ -63,5 +63,22 @@ Buidings have some dependecies like:
 
 Buildings can be upgraded but then thet might require more specialiced units, recources and higher maintanence cost.
 
+### Resource production
+
+Buildings can have resource production rates for different resources. For example:
+- Farm can produce food
+- Mine can produce metal
+- Oil rig can produce oil
+- Wood cutting place can produce wood
+
+If building does not have enough storage left then it will stop producing resources. This is why it is important to have supply chains which move resources to long term storage or to other buildings or construction sites.
+
+### Resource storage
+
+Buildings can have storage for resources. For example:
+- Farm can have storage for food but only limited amount not for long term storage.
+- Warehouse can have storage for all resources and can be upgraded to have more storage. Used for long term storage.
+- Mine can have storage for metal but only limited amount not for long term storage.
+
 
 

@@ -1,6 +1,6 @@
 # Darkforest-game
 
-[Game description](docs/doc.md)
+[Game description](docs/darkforest.md)
 
 ## Development
 
