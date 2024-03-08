@@ -6,7 +6,7 @@ import { DateTime } from "luxon"
 import { useNavigate } from "react-router-dom"
 import { BuildingProgresses } from "./progress"
 import { ResourceTabs } from "./resources"
-import { Building } from "../../types"
+import { Building } from "./types"
 
 export const Map = (props: {
 	current: BuildingDesc | undefined
@@ -200,7 +200,8 @@ export const MapPage = () => {
 								grainProduction: current.grainProduction,
 								ironProduction: current.ironProduction,
 								contructionDoneAt: DateTime.now().plus({ seconds: current.constructionTime }).toJSDate(),
-								level: 1
+								level: 1,
+								trainingUnits: []
 							})
 
 							notifyChanges()

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { MapGrid } from "../../types"
+import { MapGrid } from "./types"
 
 export const cache = {
 	newBuildingId: 1,

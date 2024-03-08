@@ -1,7 +1,7 @@
 import { DateTime } from "luxon"
 import { cache, notifyChanges, useCache } from "./cache"
 import { useEffect, useState } from "react"
-import { Building } from "../../types"
+import { Building } from "./types"
 
 const BuildingProgress = (props: { 
 	building: Building
