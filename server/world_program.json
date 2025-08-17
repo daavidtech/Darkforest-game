@@ -1,0 +1,42 @@
+{
+	"entities": [
+		{
+			"id": "barrack",
+			"abilities": [
+				{
+					"id": "train_soldier",
+					"action": "train_soldier"
+				}
+			]
+		}
+	],
+	"actions": [
+		{
+			"id": "train_soldier_begin",
+			"type": "train",
+			"target": "soldier",
+			"duration": 5,
+			"cost": {
+				"resources": {
+					"gold": 100,
+					"wood": 50
+				}
+			},
+			"action": [
+				{
+					"type": "state_change",
+					"stat": "wood",
+					"value": -50
+				},
+				{
+					"type": "timer",
+					"duration": "6000",
+					"action": {
+						"type": "spawn",
+						"entity": "soldier"
+					}
+				}
+			]
+		}
+	]
+}

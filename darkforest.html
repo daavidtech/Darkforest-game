@@ -1,724 +1,1006 @@
 <!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dark Forest — Epic Round-Based Strategy</title>
-    <meta name="description"
-        content="Dark Forest is a large‑scale, round‑based strategy game about silence, signals, and survival. Join a fresh server, build a civilization, and outwit the galaxy." />
-    <meta property="og:title" content="Dark Forest — Epic Round-Based Strategy" />
-    <meta property="og:description"
-        content="Join a fresh server, build a civilization, and outwit the galaxy. Long‑form, deterministic battles. No pay‑to‑win." />
-    <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#0b0f1a" />
-    <meta property="og:site_name" content="Offensive Games" />
-    <link rel="icon"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2325E0A7'/%3E%3Cstop offset='1' stop-color='%235A67FF'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' fill='%230b0f1a'/%3E%3Cpath d='M8 40c8-2 10-8 15-16s12-8 18-5 9 8 15 7-1 7-8 9-10 8-16 11-14 4-16-6Z' fill='url(%23g)'/%3E%3Ccircle cx='46' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E" />
-    <style>
-        :root {
-            --bg: #05070d;
-            /* deep space */
-            --bg2: #0b0f1a;
-            /* card */
-            --fg: #e6eef7;
-            /* text */
-            --muted: #9aa7b8;
-            /* secondary text */
-            --accent: #25e0a7;
-            /* emerald */
-            --accent2: #5a67ff;
-            /* indigo */
-            --glass: rgba(255, 255, 255, .06);
-            --border: rgba(255, 255, 255, .14);
-            --shadow: 0 10px 30px rgba(8, 12, 24, .6);
-            --radius: 16px;
-        }
-
-        * {
-            box-sizing: border-box
-        }
-
-        html,
-        body {
-            height: 100%
-        }
-
-        body {
-            margin: 0;
-            font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-            color: var(--fg);
-            background: radial-gradient(1200px 600px at 20% 10%, rgba(90, 103, 255, .12), transparent), radial-gradient(1000px 800px at 80% 70%, rgba(37, 224, 167, .10), transparent), var(--bg);
-            line-height: 1.5;
-            letter-spacing: .2px;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 20px
-        }
-
-        /* Nav */
-        .nav {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            backdrop-filter: saturate(1.1) blur(8px);
-            background: rgba(5, 7, 13, .6);
-            border-bottom: 1px solid var(--border)
-        }
-
-        .nav-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 0
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px
-        }
-
-        .brand .byline {
-            font-size: 12px;
-            color: var(--muted)
-        }
-
-        .logo {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            display: grid;
-            place-items: center;
-            color: #000;
-            font-weight: 900
-        }
-
-        .menu {
-            display: flex;
-            gap: 18px;
-            align-items: center
-        }
-
-        .menu a {
-            color: #cfe2ff;
-            opacity: .9
-        }
-
-        .menu a:hover {
-            opacity: 1
-        }
-
-        .cta {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #000;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-weight: 600;
-            box-shadow: var(--shadow)
-        }
-
-        .ghost {
-            border: 1px solid var(--border);
-            padding: 10px 14px;
-            border-radius: 12px
-        }
-
-        /* Hero */
-        .hero {
-            padding: 70px 0 40px;
-            text-align: center;
-            position: relative
-        }
-
-        .title {
-            font-size: clamp(28px, 4vw, 56px);
-            line-height: 1.1;
-            margin: 0;
-            letter-spacing: .4px;
-            background: linear-gradient(180deg, #fff, #c9d6ff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent
-        }
-
-        .subtitle {
-            max-width: 820px;
-            margin: 14px auto 0;
-            color: var(--muted);
-            font-size: clamp(15px, 1.8vw, 18px)
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-top: 24px;
-            flex-wrap: wrap
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, .05)
-        }
-
-        .screenshot {
-            margin: 40px auto 0;
-            max-width: 1000px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: linear-gradient(180deg, #0f1320, #0b0f1a);
-            height: 0;
-            padding-bottom: 56.25%;
-            position: relative;
-            box-shadow: var(--shadow)
-        }
-
-        .screenshot::after {
-            content: "Gameplay preview";
-            color: #a6b3c7;
-            position: absolute;
-            inset: 0;
-            display: grid;
-            place-items: center;
-        }
-
-        /* Section */
-        section {
-            padding: 64px 0
-        }
-
-        .section-title {
-            font-size: 28px;
-            margin: 0 0 8px
-        }
-
-        .section-sub {
-            color: var(--muted);
-            margin: 0 0 24px
-        }
-
-        /* Features grid */
-        .grid {
-            display: grid;
-            gap: 16px
-        }
-
-        @media (min-width:700px) {
-            .grid-3 {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .grid-2 {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .card {
-            border: 1px solid var(--border);
-            background: var(--glass);
-            border-radius: var(--radius);
-            padding: 18px
-        }
-
-        .chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 5px 10px;
-            border-radius: 999px;
-            background: rgba(90, 103, 255, .12);
-            color: #cfd3ff;
-            font-size: 12px;
-            border: 1px solid rgba(90, 103, 255, .3)
-        }
-
-        /* Servers */
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-bottom: 14px
-        }
-
-        .input {
-            background: #0e1422;
-            color: #e8f1ff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 12px;
-            outline: none;
-            min-width: 220px
-        }
-
-        .select {
-            appearance: none;
-            background: #0e1422;
-            color: #e8f1ff;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 12px;
-        }
-
-        .server {
-            display: flex;
-            flex-direction: column;
-            gap: 10px
-        }
-
-        .server-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px
-        }
-
-        .badges {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap
-        }
-
-        .server-meta {
-            color: var(--muted);
-            font-size: 14px
-        }
-
-        .progress {
-            height: 8px;
-            background: #101521;
-            border: 1px solid var(--border);
-            border-radius: 999px;
-            overflow: hidden
-        }
-
-        .progress>span {
-            height: 100%;
-            display: block;
-            background: linear-gradient(90deg, var(--accent), var(--accent2))
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border-radius: 12px;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            background: rgba(255, 255, 255, .06);
-            color: #eaf3ff;
-            cursor: pointer
-        }
-
-        .btn.primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #000;
-            font-weight: 700
-        }
-
-        .btn[disabled] {
-            opacity: .5;
-            cursor: not-allowed
-        }
-
-        /* Pricing */
-        .price {
-            font-size: 42px;
-            font-weight: 800
-        }
-
-        /* FAQ */
-        details {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 14px 16px;
-            background: var(--glass)
-        }
-
-        summary {
-            cursor: pointer;
-            font-weight: 600
-        }
-
-        /* Footer */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 24px 0;
-            color: #cbd5e1
-        }
-
-        /* Modal */
-        .modal {
-            position: fixed;
-            inset: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, .6);
-            z-index: 100
-        }
-
-        .modal[open] {
-            display: flex
-        }
-
-        .modal-card {
-            background: #0b0f1a;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            width: min(500px, 90vw);
-            box-shadow: var(--shadow)
-        }
-
-        .row {
-            display: flex;
-            gap: 10px
-        }
-
-        .full {
-            width: 100%
-        }
-
-        .note {
-            font-size: 12px;
-            color: var(--muted)
-        }
-    </style>
-</head>
-
-<body>
-    <header class="nav">
-        <div class="container nav-inner">
-            <a class="brand" href="#home" aria-label="Dark Forest home">
-                <div class="logo">★</div>
-                <strong>Dark Forest</strong>
-                <span class="byline">by Offensive Games</span>
-            </a>
-            <nav class="menu">
-                <a href="#servers">Servers</a>
-                <a href="#features">Features</a>
-                <a href="#how">How Rounds Work</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#faq">FAQ</a>
-                <a class="cta" href="#servers">Join a Game</a>
-            </nav>
-        </div>
-    </header>
-
-    <main id="home" class="hero">
-        <div class="container">
-            <h1 class="title">A grand strategy of silence, signals, and survival</h1>
-            <p class="subtitle">Build a civilization across an unforgiving galaxy. Broadcast and be found—or hide, and
-                risk being alone. Long‑form, deterministic battles. Epic worlds with thousands of players per round.</p>
-            <div class="hero-actions">
-                <a href="#servers" class="cta">Join a Game</a>
-                <a href="#features" class="ghost">Explore Features</a>
-            </div>
-            <div class="pill" style="margin:18px auto 0;">
-                <span style="width:10px; height:10px; border-radius:999px; background:var(--accent);"></span>
-                <span>One-time entry per server · No pay‑to‑win</span>
-            </div>
-            <div class="screenshot" aria-hidden="true"></div>
-        </div>
-    </main>
-
-    <section id="servers">
-        <div class="container">
-            <h2 class="section-title">Active & Upcoming Servers</h2>
-            <p class="section-sub">Pick a fresh start or drop into a living galaxy. Rounds are isolated universes with
-                their own rules and archives.</p>
-            <div class="toolbar">
-                <input id="search" class="input" placeholder="Search servers… (name, preset)" />
-                <select id="filterStatus" class="select">
-                    <option value="all">All statuses</option>
-                    <option value="open">Open now</option>
-                    <option value="upcoming">Upcoming</option>
-                    <option value="progress">In progress</option>
-                    <option value="finished">Finished</option>
-                </select>
-                <select id="filterSpeed" class="select">
-                    <option value="all">All speeds</option>
-                    <option value="fast">Fast</option>
-                    <option value="normal">Normal</option>
-                    <option value="slow">Slow</option>
-                </select>
-            </div>
-            <div id="serverGrid" class="grid grid-2"></div>
-            <p class="note" style="margin-top:10px">Note: This is a static demo. The Join button stores a local
-                placeholder and shows the expected flow. Replace hooks in <code>joinServer()</code> with your backend
-                endpoints.</p>
-        </div>
-    </section>
-
-    <section id="features">
-        <div class="container">
-            <h2 class="section-title">Designed for strategy. Built for scale.</h2>
-            <p class="section-sub">Event‑driven simulation, long‑form combat, and information warfare in a paranoid
-                galaxy.</p>
-            <div class="grid grid-3">
-                <div class="card"><span class="chip">Paranoia by physics</span>
-                    <p>Limited intel. Broadcasting makes you visible. Choose when to whisper or roar.</p>
-                </div>
-                <div class="card"><span class="chip">Long‑form combat</span>
-                    <p>Battles resolve in pulses—analyze, reinforce, retreat. No clickspam.</p>
-                </div>
-                <div class="card"><span class="chip">Deterministic sim</span>
-                    <p>Math‑first outcomes, not twitch. Fair, replayable, scalable to massive worlds.</p>
-                </div>
-                <div class="card"><span class="chip">Epic worlds</span>
-                    <p>Thousands of players per round; regions stabilize hotspots for smooth play.</p>
-                </div>
-                <div class="card"><span class="chip">Round identity</span>
-                    <p>Each season is a sealed universe with its own seed, rules, and archive.</p>
-                </div>
-                <div class="card"><span class="chip">Fair monetization</span>
-                    <p>One‑time entry per server. No power sales.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="how">
-        <div class="container">
-            <h2 class="section-title">How a Round Works</h2>
-            <p class="section-sub">From first probe to final broadcast, every season tells a different story.</p>
-            <div class="grid grid-3">
-                <div class="card"><strong>1) Join a round</strong>
-                    <p>Pick a spawn and claim your first city.</p>
-                </div>
-                <div class="card"><strong>2) Build & scout</strong>
-                    <p>Upgrade economy, probe neighbors, mind your loudness.</p>
-                </div>
-                <div class="card"><strong>3) Signal or stay silent</strong>
-                    <p>Broadcast to trade and ally—at a price.</p>
-                </div>
-                <div class="card"><strong>4) March & siege</strong>
-                    <p>Analytical battles resolve in pulses you can influence.</p>
-                </div>
-                <div class="card"><strong>5) Win your way</strong>
-                    <p>Multiple victory tracks—hegemony, science, silence.</p>
-                </div>
-                <div class="card"><strong>6) Archive & replay</strong>
-                    <p>Each round is preserved; study the galaxy you shaped.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="pricing">
-        <div class="container">
-            <h2 class="section-title">Access & Pricing</h2>
-            <p class="section-sub">One-time entry fee per server. <strong>Price drops as the round progresses.</strong>
-                No boosts, no loot boxes.</p>
-            <div class="grid grid-2">
-                <div class="card">
-                    <h3>Per‑Round Access</h3>
-                    <div class="price">From €3–€15 <span style="font-size:16px; color:var(--muted); font-weight:600">/
-                            round</span></div>
-                    <ul>
-                        <li>All features, no pay‑to‑win</li>
-                        <li>Access to this server round</li>
-                        <li><strong>Dynamic price</strong> drops as the round advances</li>
-                        <li>Post‑round replays & journals</li>
-                        <li>One‑time entry; no subscription</li>
-                    </ul>
-
-                </div>
-                <div class="card">
-                    <h3>What you get</h3>
-                    <ul>
-                        <li>Epic worlds</li>
-                        <li>Long‑form battles</li>
-                        <li>Advanced analytics (coming soon)</li>
-                        <li>Creator‑friendly API (coming soon)</li>
-                        <li>Fair moderation</li>
-                        <li>Cross‑platform web & mobile</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="faq">
-        <div class="container">
-            <h2 class="section-title">FAQ</h2>
-            <div class="grid grid-2">
-                <details>
-                    <summary>Is Dark Forest pay‑to‑win?</summary>
-                    <p>No. There are no boosters or stat sales. Access is a one‑time entry fee per server round.</p>
-                </details>
-                <details>
-                    <summary>How long is a round?</summary>
-                    <p>MVP rounds will run 6–12 weeks depending on server speed.</p>
-                </details>
-                <details>
-                    <summary>Can I play casually?</summary>
-                    <p>Yes. Battles resolve in pulses over minutes, not milliseconds. You can set orders and come back.
-                    </p>
-                </details>
-                <details>
-                    <summary>Which platforms are supported?</summary>
-                    <p>The game will run in modern browsers on desktop and mobile. Native apps are planned later.</p>
-                </details>
-                <details>
-                    <summary>Do names carry across rounds?</summary>
-                    <p>No. Rounds are separate. We don't link your identity between rounds unless you choose the same
-                        nickname again. Public leaderboards are opt‑in per round.</p>
-                </details>
-            </div>
-        </div>
-    </section>
-
-    <footer>
-        <div class="container"
-            style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-            <div class="brand">
-                <div class="logo">★</div><span>© <span id="y"></span> Offensive Games</span>
-            </div>
-            <div style="display:flex; gap:16px;">
-                <a href="#">Terms</a>
-                <a href="#">Privacy</a>
-                <a href="#servers">Contact</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Join Modal -->
-    <dialog id="joinModal" class="modal" aria-modal="true" aria-labelledby="joinTitle">
-        <div class="modal-card">
-            <h3 id="joinTitle" style="margin:0 0 8px">Join Server</h3>
-            <p id="joinDesc" class="section-sub" style="margin:0 0 14px"></p>
-            <div class="row">
-                <input id="displayName" class="input full" placeholder="Display name (visible to others)" />
-            </div>
-            <div class="row" style="margin-top:10px">
-                <input id="email" type="email" class="input full" placeholder="Email (for receipt & round notices)" />
-            </div>
-            <div style="margin-top:10px">
-                <label style="display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted)">
-                    <input type="checkbox" id="agree" /> I agree to the Terms & Privacy Policy
-                </label>
-            </div>
-            <div style="margin-top:10px">
-                <label style="display:flex; align-items:center; gap:8px; font-size:14px; color:var(--muted)">
-                    <input type="checkbox" id="optin" /> Show my nickname on public leaderboards for this round
-                    (optional)
-                </label>
-            </div>
-            <div class="row" style="margin-top:16px; justify-content:flex-end">
-                <button class="btn" onclick="closeJoin()">Cancel</button>
-                <button id="joinConfirm" class="btn primary" onclick="confirmJoin()">Join</button>
-            </div>
-        </div>
-    </dialog>
-
-
-    <script>
-        // ----- Demo data (replace with backend API) -----
-        const now = Date.now();
-        /** @type {Array<{id:string,name:string,preset:string,speed:'fast'|'normal'|'slow', roundFee:number, startMs:number, endMs:number, open:boolean, joinUntilMs?:number, playerCount:number, cap:number}>} */
-        const SERVERS = [
-            { id: 'R-2025-orion', name: 'Orion Cluster', preset: 'Standard', speed: 'normal', roundFee: 5, startMs: now + 1000 * 60 * 60 * 24 * 2, endMs: now + 1000 * 60 * 60 * 24 * 90, open: true, joinUntilMs: now + 1000 * 60 * 60 * 24 * 14, playerCount: 128, cap: 1200 },
-            { id: 'R-2025-neutrino', name: 'Neutrino Winter', preset: 'Sensor Nerf', speed: 'slow', roundFee: 9, startMs: now - 1000 * 60 * 60 * 24 * 10, endMs: now + 1000 * 60 * 60 * 24 * 50, open: true, joinUntilMs: now + 1000 * 60 * 60 * 24 * 7, playerCount: 2200, cap: 4000 },
-            { id: 'R-2025-rogue', name: 'Rogue Galaxy', preset: 'Chaos Quakes', speed: 'fast', roundFee: 7, startMs: now + 1000 * 60 * 60 * 6, endMs: now + 1000 * 60 * 60 * 24 * 42, open: true, joinUntilMs: now + 1000 * 60 * 60 * 24 * 5, playerCount: 310, cap: 2500 },
-            { id: 'R-2025-echo', name: 'Echo Realms', preset: 'Ancient Empires', speed: 'normal', roundFee: 0, startMs: now - 1000 * 60 * 60 * 24 * 80, endMs: now - 1000 * 60 * 60 * 24 * 5, open: false, playerCount: 3800, cap: 3800 },
-        ];
-
-        const state = {
-            servers: SERVERS,
-            filterStatus: 'all',
-            filterSpeed: 'all',
-            search: '',
-            selectedServer: null,
-        };
-
-        const fmt = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-
-        function statusOf(s) {
-            const t = Date.now();
-            if (s.endMs < t) return 'finished';
-            if (s.startMs > t) return 'upcoming';
-            return 'progress';
-        }
-
-        function percentElapsed(s) {
-            const t = Date.now(); const start = s.startMs; const end = s.endMs; if (t < start) return 0; if (t > end) return 100; return Math.round((t - start) / (end - start) * 100);
-        }
-
-        function timeLeft(ms) {
-            const d = Math.max(0, ms - Date.now());
-            const dd = Math.floor(d / 86400000), hh = Math.floor((d % 86400000) / 3600000), mm = Math.floor((d % 3600000) / 60000);
-            if (dd > 0) return `${dd}d ${hh}h`;
-            if (hh > 0) return `${hh}h ${mm}m`;
-            return `${mm}m`;
-        }
-
-        function dynamicPrice(s) {
-            const base = s.roundFee || 0;
-            if (base <= 0) return 0;
-            const st = statusOf(s);
-            if (st === 'upcoming') return base; // full price until start
-            const p = percentElapsed(s); // 0..100
-            const maxDiscount = 0.6; // up to 60% off by end-of-round
-            const price = Math.max(0, Math.round(base * (p / 100 < 1 ? (1 - (p / 100) * maxDiscount) : 1 - maxDiscount)));
-            return price;
-        }
-
-        function renderServers() {
-            const grid = document.getElementById('serverGrid');
-            grid.innerHTML = '';
-            const q = state.search.toLowerCase();
-            const list = state.servers.filter(s => {
-                const st = statusOf(s);
-                const statusOk = state.filterStatus === 'all' || state.filterStatus === st || (state.filterStatus === 'open' && st !== 'finished' && s.open && (!s.joinUntilMs || Date.now() < s.joinUntilMs));
-                const speedOk = state.filterSpeed === 'all' || state.filterSpeed === s.speed;
-                const textOk = !q || (s.name.toLowerCase().includes(q) || s.preset.toLowerCase().includes(q));
-                return statusOk && speedOk && textOk;
-            }).sort((a, b) => a.startMs - b.startMs);
-
-            if (list.length === 0) {
-                grid.innerHTML = '<div class="card"><strong>No servers match.</strong> Try clearing filters.</div>'
-                return;
-            }
-
-            for (const s of list) {
-                const st = statusOf(s);
-                const openNow = st !== 'finished' && s.open && (!s.joinUntilMs || Date.now() < s.joinUntilMs);
-                const pct = percentElapsed(s);
-                const startIn = s.startMs > Date.now() ? timeLeft(s.startMs) : null;
-                const endIn = timeLeft(s.endMs);
-                const paid = hasPaidRoundFee(s.id);
-                const priceNow = dynamicPrice(s);
-                const joinLabel = openNow ? (paid ? 'Join (Paid)' : (priceNow > 0 ? `Join — €${priceNow}` : 'Join')) : (st === 'finished' ? 'Closed' : 'Join closed');
-
-                const card = document.createElement('div');
-                card.className = 'card server';
-                card.innerHTML = `
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Dark Forest — Epic Round-Based Strategy</title>
+		<meta
+			name="description"
+			content="Dark Forest is a large‑scale, round‑based strategy game about silence, signals, and survival. Join a fresh server, build a civilization, and outwit the galaxy."
+		/>
+		<meta
+			property="og:title"
+			content="Dark Forest — Epic Round-Based Strategy"
+		/>
+		<meta
+			property="og:description"
+			content="Join a fresh server, build a civilization, and outwit the galaxy. Long‑form, deterministic battles. No pay‑to‑win."
+		/>
+		<meta property="og:type" content="website" />
+		<meta name="theme-color" content="#0b0f1a" />
+		<meta property="og:site_name" content="Offensive Games" />
+		<link
+			rel="icon"
+			href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2325E0A7'/%3E%3Cstop offset='1' stop-color='%235A67FF'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' fill='%230b0f1a'/%3E%3Cpath d='M8 40c8-2 10-8 15-16s12-8 18-5 9 8 15 7-1 7-8 9-10 8-16 11-14 4-16-6Z' fill='url(%23g)'/%3E%3Ccircle cx='46' cy='16' r='3' fill='%23fff'/%3E%3C/svg%3E"
+		/>
+		<style>
+			:root {
+				--bg: #05070d;
+				/* deep space */
+				--bg2: #0b0f1a;
+				/* card */
+				--fg: #e6eef7;
+				/* text */
+				--muted: #9aa7b8;
+				/* secondary text */
+				--accent: #25e0a7;
+				/* emerald */
+				--accent2: #5a67ff;
+				/* indigo */
+				--glass: rgba(255, 255, 255, 0.06);
+				--border: rgba(255, 255, 255, 0.14);
+				--shadow: 0 10px 30px rgba(8, 12, 24, 0.6);
+				--radius: 16px;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			html,
+			body {
+				height: 100%;
+			}
+
+			body {
+				margin: 0;
+				font-family:
+					ui-sans-serif,
+					system-ui,
+					-apple-system,
+					Segoe UI,
+					Roboto,
+					"Helvetica Neue",
+					Arial,
+					"Noto Sans",
+					"Liberation Sans",
+					sans-serif;
+				color: var(--fg);
+				background:
+					radial-gradient(
+						1200px 600px at 20% 10%,
+						rgba(90, 103, 255, 0.12),
+						transparent
+					),
+					radial-gradient(
+						1000px 800px at 80% 70%,
+						rgba(37, 224, 167, 0.1),
+						transparent
+					),
+					var(--bg);
+				line-height: 1.5;
+				letter-spacing: 0.2px;
+			}
+
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			.container {
+				max-width: 1100px;
+				margin: 0 auto;
+				padding: 0 20px;
+			}
+
+			/* Nav */
+			.nav {
+				position: sticky;
+				top: 0;
+				z-index: 50;
+				backdrop-filter: saturate(1.1) blur(8px);
+				background: rgba(5, 7, 13, 0.6);
+				border-bottom: 1px solid var(--border);
+			}
+
+			.nav-inner {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 14px 0;
+			}
+
+			.brand {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.brand .byline {
+				font-size: 12px;
+				color: var(--muted);
+			}
+
+			.logo {
+				width: 32px;
+				height: 32px;
+				border-radius: 10px;
+				background: linear-gradient(
+					135deg,
+					var(--accent),
+					var(--accent2)
+				);
+				display: grid;
+				place-items: center;
+				color: #000;
+				font-weight: 900;
+			}
+
+			.menu {
+				display: flex;
+				gap: 18px;
+				align-items: center;
+			}
+
+			.menu a {
+				color: #cfe2ff;
+				opacity: 0.9;
+			}
+
+			.menu a:hover {
+				opacity: 1;
+			}
+
+			.cta {
+				background: linear-gradient(
+					135deg,
+					var(--accent),
+					var(--accent2)
+				);
+				color: #000;
+				padding: 10px 14px;
+				border-radius: 12px;
+				font-weight: 600;
+				box-shadow: var(--shadow);
+			}
+
+			.ghost {
+				border: 1px solid var(--border);
+				padding: 10px 14px;
+				border-radius: 12px;
+			}
+
+			/* Hero */
+			.hero {
+				padding: 70px 0 40px;
+				text-align: center;
+				position: relative;
+			}
+
+			.title {
+				font-size: clamp(28px, 4vw, 56px);
+				line-height: 1.1;
+				margin: 0;
+				letter-spacing: 0.4px;
+				background: linear-gradient(180deg, #fff, #c9d6ff);
+				background-clip: text;
+				-webkit-background-clip: text;
+				color: transparent;
+			}
+
+			.subtitle {
+				max-width: 820px;
+				margin: 14px auto 0;
+				color: var(--muted);
+				font-size: clamp(15px, 1.8vw, 18px);
+			}
+
+			.hero-actions {
+				display: flex;
+				gap: 12px;
+				justify-content: center;
+				margin-top: 24px;
+				flex-wrap: wrap;
+			}
+
+			.pill {
+				display: inline-flex;
+				align-items: center;
+				gap: 10px;
+				padding: 12px 16px;
+				border-radius: 999px;
+				border: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.05);
+			}
+
+			.screenshot {
+				margin: 40px auto 0;
+				max-width: 1000px;
+				border-radius: 20px;
+				border: 1px solid var(--border);
+				background: linear-gradient(180deg, #0f1320, #0b0f1a);
+				height: 0;
+				padding-bottom: 56.25%;
+				position: relative;
+				box-shadow: var(--shadow);
+			}
+
+			.screenshot::after {
+				content: "Gameplay preview";
+				color: #a6b3c7;
+				position: absolute;
+				inset: 0;
+				display: grid;
+				place-items: center;
+			}
+
+			/* Section */
+			section {
+				padding: 64px 0;
+			}
+
+			.section-title {
+				font-size: 28px;
+				margin: 0 0 8px;
+			}
+
+			.section-sub {
+				color: var(--muted);
+				margin: 0 0 24px;
+			}
+
+			/* Features grid */
+			.grid {
+				display: grid;
+				gap: 16px;
+			}
+
+			@media (min-width: 700px) {
+				.grid-3 {
+					grid-template-columns: repeat(3, 1fr);
+				}
+
+				.grid-2 {
+					grid-template-columns: repeat(2, 1fr);
+				}
+			}
+
+			.card {
+				border: 1px solid var(--border);
+				background: var(--glass);
+				border-radius: var(--radius);
+				padding: 18px;
+			}
+
+			.chip {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				padding: 5px 10px;
+				border-radius: 999px;
+				background: rgba(90, 103, 255, 0.12);
+				color: #cfd3ff;
+				font-size: 12px;
+				border: 1px solid rgba(90, 103, 255, 0.3);
+			}
+
+			/* Servers */
+			.toolbar {
+				display: flex;
+				gap: 10px;
+				flex-wrap: wrap;
+				align-items: center;
+				margin-bottom: 14px;
+			}
+
+			.input {
+				background: #0e1422;
+				color: #e8f1ff;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 10px 12px;
+				outline: none;
+				min-width: 220px;
+			}
+
+			.select {
+				appearance: none;
+				background: #0e1422;
+				color: #e8f1ff;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 10px 12px;
+			}
+
+			.server {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.server-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+			}
+
+			.badges {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			.server-meta {
+				color: var(--muted);
+				font-size: 14px;
+			}
+
+			.progress {
+				height: 8px;
+				background: #101521;
+				border: 1px solid var(--border);
+				border-radius: 999px;
+				overflow: hidden;
+			}
+
+			.progress > span {
+				height: 100%;
+				display: block;
+				background: linear-gradient(
+					90deg,
+					var(--accent),
+					var(--accent2)
+				);
+			}
+
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 8px;
+				border-radius: 12px;
+				padding: 10px 14px;
+				border: 1px solid var(--border);
+				background: rgba(255, 255, 255, 0.06);
+				color: #eaf3ff;
+				cursor: pointer;
+			}
+
+			.btn.primary {
+				background: linear-gradient(
+					135deg,
+					var(--accent),
+					var(--accent2)
+				);
+				color: #000;
+				font-weight: 700;
+			}
+
+			.btn[disabled] {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			/* Pricing */
+			.price {
+				font-size: 42px;
+				font-weight: 800;
+			}
+
+			/* FAQ */
+			details {
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				padding: 14px 16px;
+				background: var(--glass);
+			}
+
+			summary {
+				cursor: pointer;
+				font-weight: 600;
+			}
+
+			/* Footer */
+			footer {
+				border-top: 1px solid var(--border);
+				padding: 24px 0;
+				color: #cbd5e1;
+			}
+
+			/* Modal */
+			.modal {
+				position: fixed;
+				inset: 0;
+				display: none;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, 0.6);
+				z-index: 100;
+			}
+
+			.modal[open] {
+				display: flex;
+			}
+
+			.modal-card {
+				background: #0b0f1a;
+				border: 1px solid var(--border);
+				border-radius: 16px;
+				padding: 20px;
+				width: min(500px, 90vw);
+				box-shadow: var(--shadow);
+			}
+
+			.row {
+				display: flex;
+				gap: 10px;
+			}
+
+			.full {
+				width: 100%;
+			}
+
+			.note {
+				font-size: 12px;
+				color: var(--muted);
+			}
+		</style>
+	</head>
+
+	<body>
+		<header class="nav">
+			<div class="container nav-inner">
+				<a class="brand" href="#home" aria-label="Dark Forest home">
+					<div class="logo">★</div>
+					<strong>Dark Forest</strong>
+					<span class="byline">by Offensive Games</span>
+				</a>
+				<nav class="menu">
+					<a href="#servers">Servers</a>
+					<a href="#features">Features</a>
+					<a href="#how">How Rounds Work</a>
+					<a href="#pricing">Pricing</a>
+					<a href="#faq">FAQ</a>
+					<a class="cta" href="#servers">Join a Game</a>
+				</nav>
+			</div>
+		</header>
+
+		<main id="home" class="hero">
+			<div class="container">
+				<h1 class="title">
+					A grand strategy of silence, signals, and survival
+				</h1>
+				<p class="subtitle">
+					Build a civilization across an unforgiving galaxy. Broadcast
+					and be found—or hide, and risk being alone. Long‑form,
+					deterministic battles. Epic worlds with thousands of players
+					per round.
+				</p>
+				<div class="hero-actions">
+					<a href="#servers" class="cta">Join a Game</a>
+					<a href="#features" class="ghost">Explore Features</a>
+				</div>
+				<div class="pill" style="margin: 18px auto 0">
+					<span
+						style="
+							width: 10px;
+							height: 10px;
+							border-radius: 999px;
+							background: var(--accent);
+						"
+					></span>
+					<span>One-time entry per server · No pay‑to‑win</span>
+				</div>
+				<div class="screenshot" aria-hidden="true"></div>
+			</div>
+		</main>
+
+		<section id="servers">
+			<div class="container">
+				<h2 class="section-title">Active & Upcoming Servers</h2>
+				<p class="section-sub">
+					Pick a fresh start or drop into a living galaxy. Rounds are
+					isolated universes with their own rules and archives.
+				</p>
+				<div class="toolbar">
+					<input
+						id="search"
+						class="input"
+						placeholder="Search servers… (name, preset)"
+					/>
+					<select id="filterStatus" class="select">
+						<option value="all">All statuses</option>
+						<option value="open">Open now</option>
+						<option value="upcoming">Upcoming</option>
+						<option value="progress">In progress</option>
+						<option value="finished">Finished</option>
+					</select>
+					<select id="filterSpeed" class="select">
+						<option value="all">All speeds</option>
+						<option value="fast">Fast</option>
+						<option value="normal">Normal</option>
+						<option value="slow">Slow</option>
+					</select>
+				</div>
+				<div id="serverGrid" class="grid grid-2"></div>
+				<p class="note" style="margin-top: 10px">
+					Note: This is a static demo. The Join button stores a local
+					placeholder and shows the expected flow. Replace hooks in
+					<code>joinServer()</code> with your backend endpoints.
+				</p>
+			</div>
+		</section>
+
+		<section id="features">
+			<div class="container">
+				<h2 class="section-title">
+					Designed for strategy. Built for scale.
+				</h2>
+				<p class="section-sub">
+					Event‑driven simulation, long‑form combat, and information
+					warfare in a paranoid galaxy.
+				</p>
+				<div class="grid grid-3">
+					<div class="card">
+						<span class="chip">Paranoia by physics</span>
+						<p>
+							Limited intel. Broadcasting makes you visible.
+							Choose when to whisper or roar.
+						</p>
+					</div>
+					<div class="card">
+						<span class="chip">Long‑form combat</span>
+						<p>
+							Battles resolve in pulses—analyze, reinforce,
+							retreat. No clickspam.
+						</p>
+					</div>
+					<div class="card">
+						<span class="chip">Deterministic sim</span>
+						<p>
+							Math‑first outcomes, not twitch. Fair, replayable,
+							scalable to massive worlds.
+						</p>
+					</div>
+					<div class="card">
+						<span class="chip">Epic worlds</span>
+						<p>
+							Thousands of players per round; regions stabilize
+							hotspots for smooth play.
+						</p>
+					</div>
+					<div class="card">
+						<span class="chip">Round identity</span>
+						<p>
+							Each season is a sealed universe with its own seed,
+							rules, and archive.
+						</p>
+					</div>
+					<div class="card">
+						<span class="chip">Fair monetization</span>
+						<p>One‑time entry per server. No power sales.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id="how">
+			<div class="container">
+				<h2 class="section-title">How a Round Works</h2>
+				<p class="section-sub">
+					From first probe to final broadcast, every season tells a
+					different story.
+				</p>
+				<div class="grid grid-3">
+					<div class="card">
+						<strong>1) Join a round</strong>
+						<p>Pick a spawn and claim your first city.</p>
+					</div>
+					<div class="card">
+						<strong>2) Build & scout</strong>
+						<p>
+							Upgrade economy, probe neighbors, mind your
+							loudness.
+						</p>
+					</div>
+					<div class="card">
+						<strong>3) Signal or stay silent</strong>
+						<p>Broadcast to trade and ally—at a price.</p>
+					</div>
+					<div class="card">
+						<strong>4) March & siege</strong>
+						<p>
+							Analytical battles resolve in pulses you can
+							influence.
+						</p>
+					</div>
+					<div class="card">
+						<strong>5) Win your way</strong>
+						<p>
+							Multiple victory tracks—hegemony, science, silence.
+						</p>
+					</div>
+					<div class="card">
+						<strong>6) Archive & replay</strong>
+						<p>
+							Each round is preserved; study the galaxy you
+							shaped.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id="pricing">
+			<div class="container">
+				<h2 class="section-title">Access & Pricing</h2>
+				<p class="section-sub">
+					One-time entry fee per server.
+					<strong>Price drops as the round progresses.</strong> No
+					boosts, no loot boxes.
+				</p>
+				<div class="grid grid-2">
+					<div class="card">
+						<h3>Per‑Round Access</h3>
+						<div class="price">
+							From €3–€15
+							<span
+								style="
+									font-size: 16px;
+									color: var(--muted);
+									font-weight: 600;
+								"
+								>/ round</span
+							>
+						</div>
+						<ul>
+							<li>All features, no pay‑to‑win</li>
+							<li>Access to this server round</li>
+							<li>
+								<strong>Dynamic price</strong> drops as the
+								round advances
+							</li>
+							<li>Post‑round replays & journals</li>
+							<li>One‑time entry; no subscription</li>
+						</ul>
+					</div>
+					<div class="card">
+						<h3>What you get</h3>
+						<ul>
+							<li>Epic worlds</li>
+							<li>Long‑form battles</li>
+							<li>Advanced analytics (coming soon)</li>
+							<li>Creator‑friendly API (coming soon)</li>
+							<li>Fair moderation</li>
+							<li>Cross‑platform web & mobile</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section id="faq">
+			<div class="container">
+				<h2 class="section-title">FAQ</h2>
+				<div class="grid grid-2">
+					<details>
+						<summary>Is Dark Forest pay‑to‑win?</summary>
+						<p>
+							No. There are no boosters or stat sales. Access is a
+							one‑time entry fee per server round.
+						</p>
+					</details>
+					<details>
+						<summary>How long is a round?</summary>
+						<p>
+							MVP rounds will run 6–12 weeks depending on server
+							speed.
+						</p>
+					</details>
+					<details>
+						<summary>Can I play casually?</summary>
+						<p>
+							Yes. Battles resolve in pulses over minutes, not
+							milliseconds. You can set orders and come back.
+						</p>
+					</details>
+					<details>
+						<summary>Which platforms are supported?</summary>
+						<p>
+							The game will run in modern browsers on desktop and
+							mobile. Native apps are planned later.
+						</p>
+					</details>
+					<details>
+						<summary>Do names carry across rounds?</summary>
+						<p>
+							No. Rounds are separate. We don't link your identity
+							between rounds unless you choose the same nickname
+							again. Public leaderboards are opt‑in per round.
+						</p>
+					</details>
+				</div>
+			</div>
+		</section>
+
+		<footer>
+			<div
+				class="container"
+				style="
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					flex-wrap: wrap;
+					gap: 10px;
+				"
+			>
+				<div class="brand">
+					<div class="logo">★</div>
+					<span>© <span id="y"></span> Offensive Games</span>
+				</div>
+				<div style="display: flex; gap: 16px">
+					<a href="#">Terms</a>
+					<a href="#">Privacy</a>
+					<a href="#servers">Contact</a>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Join Modal -->
+		<dialog
+			id="joinModal"
+			class="modal"
+			aria-modal="true"
+			aria-labelledby="joinTitle"
+		>
+			<div class="modal-card">
+				<h3 id="joinTitle" style="margin: 0 0 8px">Join Server</h3>
+				<p
+					id="joinDesc"
+					class="section-sub"
+					style="margin: 0 0 14px"
+				></p>
+				<div class="row">
+					<input
+						id="displayName"
+						class="input full"
+						placeholder="Display name (visible to others)"
+					/>
+				</div>
+				<div class="row" style="margin-top: 10px">
+					<input
+						id="email"
+						type="email"
+						class="input full"
+						placeholder="Email (for receipt & round notices)"
+					/>
+				</div>
+				<div style="margin-top: 10px">
+					<label
+						style="
+							display: flex;
+							align-items: center;
+							gap: 8px;
+							font-size: 14px;
+							color: var(--muted);
+						"
+					>
+						<input type="checkbox" id="agree" /> I agree to the
+						Terms & Privacy Policy
+					</label>
+				</div>
+				<div style="margin-top: 10px">
+					<label
+						style="
+							display: flex;
+							align-items: center;
+							gap: 8px;
+							font-size: 14px;
+							color: var(--muted);
+						"
+					>
+						<input type="checkbox" id="optin" /> Show my nickname on
+						public leaderboards for this round (optional)
+					</label>
+				</div>
+				<div
+					class="row"
+					style="margin-top: 16px; justify-content: flex-end"
+				>
+					<button class="btn" onclick="closeJoin()">Cancel</button>
+					<button
+						id="joinConfirm"
+						class="btn primary"
+						onclick="confirmJoin()"
+					>
+						Join
+					</button>
+				</div>
+			</div>
+		</dialog>
+
+		<script>
+			// ----- Demo data (replace with backend API) -----
+			const now = Date.now()
+			/** @type {Array<{id:string,name:string,preset:string,speed:'fast'|'normal'|'slow', roundFee:number, startMs:number, endMs:number, open:boolean, joinUntilMs?:number, playerCount:number, cap:number}>} */
+			const SERVERS = [
+				{
+					id: "R-2025-orion",
+					name: "Orion Cluster",
+					preset: "Standard",
+					speed: "normal",
+					roundFee: 5,
+					startMs: now + 1000 * 60 * 60 * 24 * 2,
+					endMs: now + 1000 * 60 * 60 * 24 * 90,
+					open: true,
+					joinUntilMs: now + 1000 * 60 * 60 * 24 * 14,
+					playerCount: 128,
+					cap: 1200,
+				},
+				{
+					id: "R-2025-neutrino",
+					name: "Neutrino Winter",
+					preset: "Sensor Nerf",
+					speed: "slow",
+					roundFee: 9,
+					startMs: now - 1000 * 60 * 60 * 24 * 10,
+					endMs: now + 1000 * 60 * 60 * 24 * 50,
+					open: true,
+					joinUntilMs: now + 1000 * 60 * 60 * 24 * 7,
+					playerCount: 2200,
+					cap: 4000,
+				},
+				{
+					id: "R-2025-rogue",
+					name: "Rogue Galaxy",
+					preset: "Chaos Quakes",
+					speed: "fast",
+					roundFee: 7,
+					startMs: now + 1000 * 60 * 60 * 6,
+					endMs: now + 1000 * 60 * 60 * 24 * 42,
+					open: true,
+					joinUntilMs: now + 1000 * 60 * 60 * 24 * 5,
+					playerCount: 310,
+					cap: 2500,
+				},
+				{
+					id: "R-2025-echo",
+					name: "Echo Realms",
+					preset: "Ancient Empires",
+					speed: "normal",
+					roundFee: 0,
+					startMs: now - 1000 * 60 * 60 * 24 * 80,
+					endMs: now - 1000 * 60 * 60 * 24 * 5,
+					open: false,
+					playerCount: 3800,
+					cap: 3800,
+				},
+			]
+
+			const state = {
+				servers: SERVERS,
+				filterStatus: "all",
+				filterSpeed: "all",
+				search: "",
+				selectedServer: null,
+			}
+
+			const fmt = new Intl.DateTimeFormat(undefined, {
+				dateStyle: "medium",
+				timeStyle: "short",
+			})
+
+			function statusOf(s) {
+				const t = Date.now()
+				if (s.endMs < t) return "finished"
+				if (s.startMs > t) return "upcoming"
+				return "progress"
+			}
+
+			function percentElapsed(s) {
+				const t = Date.now()
+				const start = s.startMs
+				const end = s.endMs
+				if (t < start) return 0
+				if (t > end) return 100
+				return Math.round(((t - start) / (end - start)) * 100)
+			}
+
+			function timeLeft(ms) {
+				const d = Math.max(0, ms - Date.now())
+				const dd = Math.floor(d / 86400000),
+					hh = Math.floor((d % 86400000) / 3600000),
+					mm = Math.floor((d % 3600000) / 60000)
+				if (dd > 0) return `${dd}d ${hh}h`
+				if (hh > 0) return `${hh}h ${mm}m`
+				return `${mm}m`
+			}
+
+			function dynamicPrice(s) {
+				const base = s.roundFee || 0
+				if (base <= 0) return 0
+				const st = statusOf(s)
+				if (st === "upcoming") return base // full price until start
+				const p = percentElapsed(s) // 0..100
+				const maxDiscount = 0.6 // up to 60% off by end-of-round
+				const price = Math.max(
+					0,
+					Math.round(
+						base *
+							(p / 100 < 1
+								? 1 - (p / 100) * maxDiscount
+								: 1 - maxDiscount),
+					),
+				)
+				return price
+			}
+
+			function renderServers() {
+				const grid = document.getElementById("serverGrid")
+				grid.innerHTML = ""
+				const q = state.search.toLowerCase()
+				const list = state.servers
+					.filter((s) => {
+						const st = statusOf(s)
+						const statusOk =
+							state.filterStatus === "all" ||
+							state.filterStatus === st ||
+							(state.filterStatus === "open" &&
+								st !== "finished" &&
+								s.open &&
+								(!s.joinUntilMs || Date.now() < s.joinUntilMs))
+						const speedOk =
+							state.filterSpeed === "all" ||
+							state.filterSpeed === s.speed
+						const textOk =
+							!q ||
+							s.name.toLowerCase().includes(q) ||
+							s.preset.toLowerCase().includes(q)
+						return statusOk && speedOk && textOk
+					})
+					.sort((a, b) => a.startMs - b.startMs)
+
+				if (list.length === 0) {
+					grid.innerHTML =
+						'<div class="card"><strong>No servers match.</strong> Try clearing filters.</div>'
+					return
+				}
+
+				for (const s of list) {
+					const st = statusOf(s)
+					const openNow =
+						st !== "finished" &&
+						s.open &&
+						(!s.joinUntilMs || Date.now() < s.joinUntilMs)
+					const pct = percentElapsed(s)
+					const startIn =
+						s.startMs > Date.now() ? timeLeft(s.startMs) : null
+					const endIn = timeLeft(s.endMs)
+					const paid = hasPaidRoundFee(s.id)
+					const priceNow = dynamicPrice(s)
+					const joinLabel = openNow
+						? paid
+							? "Join (Paid)"
+							: priceNow > 0
+								? `Join — €${priceNow}`
+								: "Join"
+						: st === "finished"
+							? "Closed"
+							: "Join closed"
+
+					const card = document.createElement("div")
+					card.className = "card server"
+					card.innerHTML = `
           <div class="server-head">
             <div>
               <div class="badges" style="margin-bottom:8px">
                 <span class="chip">${s.preset}</span>
                 <span class="chip" style="background:rgba(37,224,167,.12); border-color: rgba(37,224,167,.3); color:#caffea">${s.speed.toUpperCase()}</span>
-                <span class="chip" style="background:${st === 'upcoming' ? 'rgba(90,103,255,.12)' : st === 'progress' ? 'rgba(37,224,167,.12)' : 'rgba(255,255,255,.08)'}; border-color: var(--border);">${st.toUpperCase()}</span>
+                <span class="chip" style="background:${st === "upcoming" ? "rgba(90,103,255,.12)" : st === "progress" ? "rgba(37,224,167,.12)" : "rgba(255,255,255,.08)"}; border-color: var(--border);">${st.toUpperCase()}</span>
               </div>
               <h3 style="margin:0 0 4px">${s.name}</h3>
-              <div class="server-meta">${st === 'upcoming' ? `Starts ${fmt.format(s.startMs)} · in ${startIn} · Fee €${s.roundFee}` : st === 'progress' ? `Ends ${fmt.format(s.endMs)} · ${100 - pct}% left · Fee €${priceNow} (dynamic)` : `Ended ${fmt.format(s.endMs)}`}</div>
+              <div class="server-meta">${st === "upcoming" ? `Starts ${fmt.format(s.startMs)} · in ${startIn} · Fee €${s.roundFee}` : st === "progress" ? `Ends ${fmt.format(s.endMs)} · ${100 - pct}% left · Fee €${priceNow} (dynamic)` : `Ended ${fmt.format(s.endMs)}`}</div>
             </div>
             <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; min-width:220px">
               <div class="server-meta">Players: ${s.playerCount.toLocaleString()} / ${s.cap.toLocaleString()}</div>
@@ -726,97 +1008,146 @@
                 <span style="width:${pct}%;"></span>
               </div>
               <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
-                ${st === 'progress' ? `<button class="btn" onclick="spectate('${s.id}')">Spectate</button>` : ''}
-                <button class="btn primary" ${openNow ? '' : 'disabled'} onclick="beginJoin('${s.id}')">${joinLabel}</button>
+                ${st === "progress" ? `<button class="btn" onclick="spectate('${s.id}')">Spectate</button>` : ""}
+                <button class="btn primary" ${openNow ? "" : "disabled"} onclick="beginJoin('${s.id}')">${joinLabel}</button>
               </div>
             </div>
           </div>
-        `;
-                grid.appendChild(card);
-            }
-        }
+        `
+					grid.appendChild(card)
+				}
+			}
 
-        function spectate(id) {
-            alert('Spectator mode placeholder for ' + id + ' — wire to /play/' + id + ' in the real app.');
-        }
+			function spectate(id) {
+				alert(
+					"Spectator mode placeholder for " +
+						id +
+						" — wire to /play/" +
+						id +
+						" in the real app.",
+				)
+			}
 
-        // ----- Join flow (demo) -----
-        function getServer(id) { return state.servers.find(s => s.id === id); }
+			// ----- Join flow (demo) -----
+			function getServer(id) {
+				return state.servers.find((s) => s.id === id)
+			}
 
-        function beginJoin(id) {
-            state.selectedServer = getServer(id);
-            const s = state.selectedServer; if (!s) return;
-            document.getElementById('joinTitle').textContent = `Join ${s.name}`;
-            const st = statusOf(s);
-            const priceNow = dynamicPrice(s);
-            let desc = st === 'upcoming'
-                ? `Round starts ${fmt.format(s.startMs)}. Entry fee: €${priceNow} (charged now).`
-                : `Round ends ${fmt.format(s.endMs)}. Entry fee: €${priceNow} (dynamic).`;
-            document.getElementById('joinDesc').textContent = desc;
-            document.getElementById('displayName').value = localStorage.getItem('df.displayName') || '';
-            document.getElementById('email').value = localStorage.getItem('df.email') || '';
-            document.getElementById('agree').checked = false;
-            document.getElementById('optin').checked = localStorage.getItem(`df.optin.${s.id}`) === '1';
-            document.getElementById('joinModal').setAttribute('open', '');
-        }
+			function beginJoin(id) {
+				state.selectedServer = getServer(id)
+				const s = state.selectedServer
+				if (!s) return
+				document.getElementById("joinTitle").textContent =
+					`Join ${s.name}`
+				const st = statusOf(s)
+				const priceNow = dynamicPrice(s)
+				let desc =
+					st === "upcoming"
+						? `Round starts ${fmt.format(s.startMs)}. Entry fee: €${priceNow} (charged now).`
+						: `Round ends ${fmt.format(s.endMs)}. Entry fee: €${priceNow} (dynamic).`
+				document.getElementById("joinDesc").textContent = desc
+				document.getElementById("displayName").value =
+					localStorage.getItem("df.displayName") || ""
+				document.getElementById("email").value =
+					localStorage.getItem("df.email") || ""
+				document.getElementById("agree").checked = false
+				document.getElementById("optin").checked =
+					localStorage.getItem(`df.optin.${s.id}`) === "1"
+				document.getElementById("joinModal").setAttribute("open", "")
+			}
 
-        function closeJoin() { document.getElementById('joinModal').removeAttribute('open'); }
+			function closeJoin() {
+				document.getElementById("joinModal").removeAttribute("open")
+			}
 
-        function confirmJoin() {
-            const name = document.getElementById('displayName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const agree = document.getElementById('agree').checked;
-            if (!name) { alert('Please enter a display name.'); return; }
-            if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
-            if (!agree) { alert('Please agree to the Terms & Privacy.'); return; }
-            localStorage.setItem('df.displayName', name);
-            localStorage.setItem('df.email', email);
+			function confirmJoin() {
+				const name = document.getElementById("displayName").value.trim()
+				const email = document.getElementById("email").value.trim()
+				const agree = document.getElementById("agree").checked
+				if (!name) {
+					alert("Please enter a display name.")
+					return
+				}
+				if (!email || !email.includes("@")) {
+					alert("Please enter a valid email.")
+					return
+				}
+				if (!agree) {
+					alert("Please agree to the Terms & Privacy.")
+					return
+				}
+				localStorage.setItem("df.displayName", name)
+				localStorage.setItem("df.email", email)
 
-            // Save leaderboard opt-in per round (demo only)
-            const optin = document.getElementById('optin').checked;
-            const s = state.selectedServer; if (s) localStorage.setItem(`df.optin.${s.id}`, optin ? '1' : '0');
+				// Save leaderboard opt-in per round (demo only)
+				const optin = document.getElementById("optin").checked
+				const s = state.selectedServer
+				if (s)
+					localStorage.setItem(`df.optin.${s.id}`, optin ? "1" : "0")
 
-            // Entry model: per‑round fee (no membership)
-            payRoundFeeThenFinalize();
-        }
+				// Entry model: per‑round fee (no membership)
+				payRoundFeeThenFinalize()
+			}
 
-        function hasPaidRoundFee(id) { return localStorage.getItem(`df.paidRound.${id}`) === '1'; }
+			function hasPaidRoundFee(id) {
+				return localStorage.getItem(`df.paidRound.${id}`) === "1"
+			}
 
-        function payRoundFeeThenFinalize() {
-            const s = state.selectedServer; if (!s) return;
-            if (s.roundFee > 0 && !hasPaidRoundFee(s.id)) {
-                const price = dynamicPrice(s);
-                if (price > 0) {
-                    const ok = confirm(`Join ${s.name}? One‑time entry fee €${price}. Continue?`);
-                    if (!ok) return;
-                }
-                localStorage.setItem(`df.paidRound.${s.id}`, '1');
-            }
-            finalizeJoin();
-        }
+			function payRoundFeeThenFinalize() {
+				const s = state.selectedServer
+				if (!s) return
+				if (s.roundFee > 0 && !hasPaidRoundFee(s.id)) {
+					const price = dynamicPrice(s)
+					if (price > 0) {
+						const ok = confirm(
+							`Join ${s.name}? One‑time entry fee €${price}. Continue?`,
+						)
+						if (!ok) return
+					}
+					localStorage.setItem(`df.paidRound.${s.id}`, "1")
+				}
+				finalizeJoin()
+			}
 
-        function finalizeJoin() {
-            const s = state.selectedServer; if (!s) return;
-            // Demo: mark as joined in localStorage
-            const joined = JSON.parse(localStorage.getItem('df.joined') || '[]');
-            if (!joined.includes(s.id)) joined.push(s.id);
-            localStorage.setItem('df.joined', JSON.stringify(joined));
-            alert(`Welcome to ${s.name}! In the real game, redirect to /play/${s.id}`);
-            closeJoin();
-        }
+			function finalizeJoin() {
+				const s = state.selectedServer
+				if (!s) return
+				// Demo: mark as joined in localStorage
+				const joined = JSON.parse(
+					localStorage.getItem("df.joined") || "[]",
+				)
+				if (!joined.includes(s.id)) joined.push(s.id)
+				localStorage.setItem("df.joined", JSON.stringify(joined))
+				alert(
+					`Welcome to ${s.name}! In the real game, redirect to /play/${s.id}`,
+				)
+				closeJoin()
+			}
 
-        // ----- Filters -----
-        document.getElementById('search').addEventListener('input', (e) => { state.search = e.target.value; renderServers(); });
-        document.getElementById('filterStatus').addEventListener('change', (e) => { state.filterStatus = e.target.value; renderServers(); });
-        document.getElementById('filterSpeed').addEventListener('change', (e) => { state.filterSpeed = e.target.value; renderServers(); });
+			// ----- Filters -----
+			document.getElementById("search").addEventListener("input", (e) => {
+				state.search = e.target.value
+				renderServers()
+			})
+			document
+				.getElementById("filterStatus")
+				.addEventListener("change", (e) => {
+					state.filterStatus = e.target.value
+					renderServers()
+				})
+			document
+				.getElementById("filterSpeed")
+				.addEventListener("change", (e) => {
+					state.filterSpeed = e.target.value
+					renderServers()
+				})
 
-        // Footer year
-        document.getElementById('y').textContent = new Date().getFullYear();
+			// Footer year
+			document.getElementById("y").textContent = new Date().getFullYear()
 
-        // Initial render + periodic countdown/progress refresh
-        renderServers();
-        setInterval(renderServers, 30_000);
-    </script>
-</body>
-
+			// Initial render + periodic countdown/progress refresh
+			renderServers()
+			setInterval(renderServers, 30_000)
+		</script>
+	</body>
 </html>

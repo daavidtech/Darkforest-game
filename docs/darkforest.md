@@ -3,8 +3,9 @@
 ## Unit
 
 Unit construction takes some amount of resources and population. After construction these units have certain maintanence cost. Units are movable and can move by themself. One unit can be for example:
+
 - One kokobongo with glub. Which only require one population per unit.
-- Something like [Contubernium](https://en.wikipedia.org/wiki/Contubernium_(Roman_army_unit)) which has few soldiers and requires something around 8 population.
+- Something like [Contubernium](<https://en.wikipedia.org/wiki/Contubernium_(Roman_army_unit)>) which has few soldiers and requires something around 8 population.
 - Tanks which might require around 4 population.
 - Battleship which might require 100 to 1000 population.
 - Big spachips tink of something like in starwars where they might be thousands to hundereds of thousands.
@@ -30,17 +31,20 @@ Battles are always onesided meaning that they are simulated from point of view o
 ### Damage
 
 Things that affect damage done to the enemy unit are:
+
 - Attack damage
 - Accuracy
 - Enemy unit defense stat which is different to different damage types
 - Attack speed
 
 ## Currency
+
 There is no single currency players can create their own or choose to use existing ones. Value of the currency is determined by the player based on how much there is it and population and exchange rates.
 
-Factories can use money to give assign value for the resource they are producing.  This allows unifactories to efficiently obtain resources for factories.
+Factories can use money to give assign value for the resource they are producing. This allows unifactories to efficiently obtain resources for factories.
 
 ## Map
+
 One grid rectangle is 10 meters
 
 One mapgrid size could be 10 000 km2 so around 1 000 000 rectangles.
@@ -57,13 +61,14 @@ Maybe space could be three dimensional map grid where structures need to be plac
 
 ## Speed
 
-It would be fun if the game time would have realistic time but it would be just speedup by x amount. However in real life difference between movent speed and building speed is quite high. For example if school building 8 month and the we would speed up time by 1000 then building this building would take few hours and going through the whole map would take 1 hour. 
+It would be fun if the game time would have realistic time but it would be just speedup by x amount. However in real life difference between movent speed and building speed is quite high. For example if school building 8 month and the we would speed up time by 1000 then building this building would take few hours and going through the whole map would take 1 hour.
 
 ## Building
 
 Building buildings require resources and workers. Also requires certain Technology stage. Buildings may also require certain vehicles for building like building modern big building without any machines would be very slow.
 
 Buidings have some dependecies like:
+
 - Resources like stone, metal....
 - Specialiced unit like teachers, engineers..
 - Innovation level
@@ -85,6 +90,7 @@ Buildings can be upgraded but then thet might require more specialiced units, re
 ### Resource production
 
 Buildings can have resource production rates for different resources. For example:
+
 - Farm can produce food
 - Mine can produce metal
 - Oil rig can produce oil
@@ -95,6 +101,7 @@ If building does not have enough storage left then it will stop producing resour
 ### Resource storage
 
 Buildings can have storage for resources. For example:
+
 - Farm can have storage for food but only limited amount not for long term storage.
 - Warehouse can have storage for all resources and can be upgraded to have more storage. Used for long term storage.
 - Mine can have storage for metal but only limited amount not for long term storage.
@@ -102,4 +109,3 @@ Buildings can have storage for resources. For example:
 ### Unit storage
 
 Buildings can store units like normal houses can store people and military base can store soldiers. Also units like tanks require more specialiced storage. Buildings have flags for each type of units it can store.
-

@@ -1,4 +1,1 @@
-
-export class UnitList {
-    
-}
+export class UnitList {}

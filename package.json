@@ -1,10 +1,14 @@
 {
-  "name": "darkforest",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  }
+	"name": "darkforest",
+	"private": true,
+	"scripts": {
+		"format": "prettier --write --no-semi ."
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"prettier": "^3.6.2"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	}
 }
