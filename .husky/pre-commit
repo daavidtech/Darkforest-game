@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# Husky pre-commit hook
+
+# Run lint-staged to lint/format only staged files
+bunx lint-staged
+
