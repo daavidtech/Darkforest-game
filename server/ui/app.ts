@@ -1,10 +1,10 @@
 import { mapPage } from "./map"
 import { overviewPage } from "./overview"
-import { routes } from "./router"
+import { navigate, routes } from "./router"
 import { loginPage } from "./login"
 import { resourcesPage } from "./resources"
 import { applyThemeFromStorage } from "./theme"
-import { refreshUser } from "./auth"
+import { refreshUser, getUser } from "./auth"
 import { loadResourceRates } from "./state"
 
 window.onload = () => {
@@ -18,11 +18,24 @@ window.onload = () => {
 		return
 	}
 
+	const requireAuth = (handler: () => void) => () => {
+		const user = getUser()
+		if (!user) {
+			navigate("/login")
+			return
+		}
+		handler()
+	}
+
 	routes({
-		"/": () => overviewPage(body),
-		"/map": () => mapPage(body),
+		"/": () => {
+			const user = getUser()
+			if (!user) return navigate("/login")
+			overviewPage(body)
+		},
+		"/map": requireAuth(() => mapPage(body)),
 		"/login": () => loginPage(body),
-		"/resources": () => resourcesPage(body),
+		"/resources": requireAuth(() => resourcesPage(body)),
 		"/*": () => {
 			body.innerHTML = "<h1>404 Not Found</h1>"
 		},

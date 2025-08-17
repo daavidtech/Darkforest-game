@@ -46,14 +46,14 @@ export const NavBar = (active: RouteKey) => {
 	const center = document.createElement("div")
 	center.style.display = "flex"
 	center.style.gap = "8px"
-	center.appendChild(NavLink("Overview", "/", active === "overview"))
-	center.appendChild(NavLink("Map", "/map", active === "map"))
-	center.appendChild(
-		NavLink("Resources", "/resources", active === "resources"),
-	)
 	const current = getUser()
-	if (!current)
-		center.appendChild(NavLink("Login", "/login", active === "login"))
+	if (current) {
+		center.appendChild(NavLink("Overview", "/", active === "overview"))
+		center.appendChild(NavLink("Map", "/map", active === "map"))
+		center.appendChild(
+			NavLink("Resources", "/resources", active === "resources"),
+		)
+	}
 
 	const right = document.createElement("div")
 	right.style.display = "flex"
