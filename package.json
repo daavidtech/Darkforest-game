@@ -7,7 +7,8 @@
 		"typecheck": "tsc -p tsconfig.json --noEmit",
 		"test": "bun test",
 		"lint": "eslint . --ext .ts,.tsx --max-warnings=0",
-		"lint-fix": "eslint . --ext .ts,.tsx --fix"
+		"lint-fix": "eslint . --ext .ts,.tsx --fix",
+		"prepare": "husky install"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
@@ -17,7 +18,15 @@
 		"@typescript-eslint/parser": "^7.18.0",
 		"@typescript-eslint/eslint-plugin": "^7.18.0",
 		"eslint-config-prettier": "^9.1.0",
-		"globals": "^15.11.0"
+		"globals": "^15.11.0",
+		"husky": "^9.1.6",
+		"lint-staged": "^15.2.10"
+	},
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx,json,css,md}": [
+			"prettier --write --no-semi",
+			"eslint --fix"
+		]
 	},
 	"peerDependencies": {
 		"typescript": "^5"
