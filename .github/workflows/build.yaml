@@ -25,8 +25,8 @@ jobs:
               run: bun run typecheck
             - name: Run tests
               run: bun test --bail
-            - name: Build server bundle
-              run: bun build server/server.ts --outdir dist
+            - name: Build server bundle (Bun target)
+              run: bun build --target=bun server/server.ts --outdir dist
 
     build:
         runs-on: ubuntu-latest
