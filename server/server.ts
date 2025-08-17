@@ -1,6 +1,6 @@
 import index from "./ui/index.html"
 import { createJWT, verifyJWT } from "./jwt"
-import { initDB, getUser as dbGetUser, getUserRates, db } from "./db"
+import { db } from "./db"
 
 db.init()
 
@@ -58,9 +58,7 @@ Bun.serve({
 		"/api/login": methodRoutes({
 			POST: async (req) => {
 				const { username, password } = await req.json()
-				// Ensure DB is initialized
-				initDB()
-				const u = dbGetUser(username)
+				const u = db.getUser(username)
 				if (u && u.password === password) {
 					const token = await createJWT({ sub: username })
 					return json({ token })
@@ -75,8 +73,7 @@ Bun.serve({
 		}),
 		"/api/rates": methodRoutes({
 			GET: withAuth(async (_req, payload) => {
-				initDB()
-				const rates = getUserRates(payload.sub as string)
+				const rates = db.getUserRates(payload.sub as string)
 				if (!rates)
 					return json({ rates: { wood: 1, iron: 1, food: 1 } })
 				return json({ rates })
