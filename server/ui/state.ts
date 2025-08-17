@@ -8,6 +8,7 @@ export type BuildQueueItem = {
 	startedAt: number
 	finishAt: number
 	status: "building" | "completed"
+	action: "build" | "upgrade"
 }
 
 const et = new EventTarget()
@@ -17,6 +18,13 @@ export type Resources = { wood: number; iron: number; food: number }
 const state = {
 	buildQueue: [] as BuildQueueItem[],
 	resources: { wood: 0, iron: 0, food: 0 } as Resources,
+	buildings: [] as {
+		id: string
+		building: Building
+		origin: { x: number; y: number }
+		level: number
+		owner: "self" | "enemy"
+	}[],
 }
 
 const emit = () => {
@@ -47,16 +55,22 @@ const durationFor = (b: Building) => {
 export const enqueueBuild = (
 	building: Building,
 	origin: { x: number; y: number },
+	action: "build" | "upgrade" = "build",
 ) => {
 	const now = Date.now()
-	const dur = durationFor(building)
+	const existing = getPlacedAt(origin.x, origin.y)
+	const level = existing?.level ?? 1
+	const base = durationFor(building)
+	const dur =
+		action === "upgrade" ? Math.round(base * (1 + 0.5 * (level - 1))) : base
 	const item: BuildQueueItem = {
-		id: `${building.name}-${origin.x}-${origin.y}-${now}`,
+		id: `${action}-${building.name}-${origin.x}-${origin.y}-${now}`,
 		building,
 		origin,
 		startedAt: now,
 		finishAt: now + dur,
 		status: "building",
+		action,
 	}
 	state.buildQueue.push(item)
 	emit()
@@ -68,6 +82,13 @@ export const enqueueBuild = (
 			if (it && it.status === "building") {
 				it.status = "completed"
 				emit()
+				if (item.action === "upgrade") {
+					const pb = getPlacedAt(item.origin.x, item.origin.y)
+					if (pb) {
+						pb.level += 1
+						emitBuildings()
+					}
+				}
 			}
 		},
 		Math.max(0, remaining),
@@ -113,4 +134,47 @@ export const loadResourceRates = async () => {
 		if (r && typeof r.iron === "number") baseRates.iron = r.iron
 		if (r && typeof r.food === "number") baseRates.food = r.food
 	} catch {}
+}
+
+// Buildings registry helpers
+export const addPlacedBuilding = (
+	building: Building,
+	origin: { x: number; y: number },
+	owner: "self" | "enemy" = "self",
+) => {
+	const id = `${building.name}-${origin.x}-${origin.y}`
+	const exists = state.buildings.find((b) => b.id === id)
+	if (!exists) {
+		state.buildings.push({ id, building, origin, level: 1, owner })
+		emitBuildings()
+	}
+}
+
+export const getPlacedBuildings = () => state.buildings.slice()
+export const getPlacedAt = (x: number, y: number) =>
+	state.buildings.find((b) => b.origin.x === x && b.origin.y === y) || null
+
+const emitBuildings = () => {
+	et.dispatchEvent(
+		new CustomEvent("buildings", { detail: getPlacedBuildings() }),
+	)
+}
+
+export const onBuildingsChange = (
+	cb: (items: ReturnType<typeof getPlacedBuildings>) => void,
+) => {
+	const handler = (e: Event) => cb((e as CustomEvent).detail)
+	et.addEventListener("buildings", handler)
+	cb(getPlacedBuildings())
+	return () => et.removeEventListener("buildings", handler)
+}
+
+export const requestUpgradeAt = (x: number, y: number) => {
+	const pb = getPlacedAt(x, y)
+	if (!pb) return null
+	const inProgress = state.buildQueue.find(
+		(q) => q.origin.x === x && q.origin.y === y && q.status === "building",
+	)
+	if (inProgress) return inProgress
+	return enqueueBuild(pb.building, pb.origin, "upgrade")
 }

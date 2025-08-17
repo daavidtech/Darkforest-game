@@ -1,6 +1,14 @@
 import type { Building } from "./buildinglist"
 import { buildinglist, allBuildings } from "./buildinglist"
-import { enqueueBuild, getBuildQueue, onBuildQueueChange } from "./state"
+import {
+	enqueueBuild,
+	getBuildQueue,
+	onBuildQueueChange,
+	addPlacedBuilding,
+	getPlacedBuildings,
+	onBuildingsChange,
+} from "./state"
+import { navigate } from "./router"
 import { withLayout } from "./nav"
 
 const GRID_W = 20
@@ -228,8 +236,9 @@ const MapView = () => {
 		}
 		placed.push(pb)
 		renderBuilding(pb)
-		// Add to global build queue for overview tracking
-		enqueueBuild(building, { x: ox, y: oy })
+		// Register globally and enqueue initial build
+		addPlacedBuilding(building, { x: ox, y: oy }, "self")
+		enqueueBuild(building, { x: ox, y: oy }, "build")
 	}
 
 	// Optional: quick helper to place an enemy building via console
@@ -245,6 +254,7 @@ const MapView = () => {
 		}
 		placed.push(pb)
 		renderBuilding(pb)
+		addPlacedBuilding(building, { x: ox, y: oy }, "enemy")
 		return true
 	}
 
@@ -302,6 +312,18 @@ const MapView = () => {
 				// optional: don't clear on every leave to avoid flicker
 			})
 			cell.addEventListener("drop", (e) => handleDrop(e as DragEvent, c))
+			cell.addEventListener("click", () => {
+				if (occupied.has(makeKey(x, y))) {
+					navigate(`/building/${x}/${y}`)
+				}
+			})
+
+			// Click to open building details if occupied
+			cell.addEventListener("click", () => {
+				if (occupied.has(makeKey(x, y))) {
+					navigate(`/building/${x}/${y}`)
+				}
+			})
 
 			// Optional coordinates label
 			const label = document.createElement("div")
@@ -461,6 +483,41 @@ const MapView = () => {
 		if (!b) return false
 		return placeEnemy(b, x, y)
 	}
+
+	// Hydrate from global state when (re)opening the map
+	const hasPlaced = (b: PlacedBuilding) =>
+		placed.some(
+			(p) =>
+				p.building.name === b.building.name &&
+				p.origin.x === b.origin.x &&
+				p.origin.y === b.origin.y,
+		)
+	const occupy = (b: PlacedBuilding) => {
+		b.building.shape.forEach(({ x, y }) =>
+			occupied.add(makeKey(b.origin.x + x, b.origin.y + y)),
+		)
+	}
+	const hydrateFromState = () => {
+		const all = getPlacedBuildings()
+		for (const g of all) {
+			const pb: PlacedBuilding = {
+				building: g.building,
+				origin: g.origin,
+				owner: g.owner,
+			}
+			if (!hasPlaced(pb)) {
+				placed.push(pb)
+				occupy(pb)
+				renderBuilding(pb)
+			}
+		}
+	}
+	hydrateFromState()
+
+	// React to new buildings added while this view is open
+	onBuildingsChange(() => {
+		hydrateFromState()
+	})
 
 	// Update tints when build queue changes
 	onBuildQueueChange(() => {
