@@ -2,7 +2,10 @@
 	"name": "darkforest",
 	"private": true,
 	"scripts": {
-		"format": "prettier --write --no-semi ."
+		"format": "prettier --write --no-semi .",
+		"format:check": "prettier --check --no-semi .",
+		"typecheck": "tsc -p tsconfig.json --noEmit",
+		"test": "bun test"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
