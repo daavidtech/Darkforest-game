@@ -1,0 +1,1 @@
+After changes run npm run typecheck, npm run format, npm run lint, npm test
