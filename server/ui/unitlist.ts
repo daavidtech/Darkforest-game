@@ -41,7 +41,9 @@ const renderQueueList = (container: HTMLElement, items: TrainQueueItem[]) => {
 			row.style.borderRadius = "8px"
 			row.style.background = "var(--card)"
 			const title = document.createElement("div")
-			title.textContent = `${item.unit} @ (${item.origin.x},${item.origin.y})`
+			const qty =
+				item.quantity && item.quantity > 1 ? ` x ${item.quantity}` : ""
+			title.textContent = `${item.unit}${qty} @ (${item.origin.x},${item.origin.y})`
 			title.style.fontSize = "14px"
 			const total = item.finishAt - item.startedAt
 			const elapsed = Math.min(total, Math.max(0, now - item.startedAt))
@@ -80,6 +82,7 @@ const renderUnits = (container: HTMLElement, units: Unit[]) => {
 }
 
 export const unitListPage = (body: HTMLElement) => {
+	console.log("rendering unit list page")
 	withLayout(body, "units", (root) => {
 		const grid = document.createElement("div")
 		grid.style.display = "grid"

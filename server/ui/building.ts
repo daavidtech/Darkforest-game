@@ -9,6 +9,7 @@ import {
 	getTrainQueue,
 	onTrainQueueChange,
 } from "./state"
+import { trainablesForBuilding, findUnitSpec } from "./units-meta.ts"
 import { navigate } from "./router"
 
 const fmtTimeLeft = (ms: number) => {
@@ -85,21 +86,16 @@ export const buildingPage = (body: HTMLElement, x: number, y: number) => {
 		trainBar.style.width = "0%"
 		trainBar.style.background = "var(--accent)"
 		trainProgress.appendChild(trainBar)
-		const trainBtn = document.createElement("button")
-		trainBtn.textContent = "Train Soldier"
-		trainBtn.style.padding = "8px 12px"
-		trainBtn.style.border = "1px solid var(--border)"
-		trainBtn.style.background = "var(--button-bg)"
-		trainBtn.style.color = "var(--fg)"
-		trainBtn.style.borderRadius = "6px"
-		trainBtn.style.cursor = "pointer"
-		trainBtn.onclick = () => {
-			requestTrainAt(x, y, "soldier")
-			render()
-		}
+
+		// Container for available trainable units at this building
+		const trainControls = document.createElement("div")
+		trainControls.style.display = "grid"
+		trainControls.style.gridTemplateColumns = "1fr"
+		trainControls.style.gap = "8px"
+
 		trainSection.appendChild(trainStatus)
 		trainSection.appendChild(trainProgress)
-		trainSection.appendChild(trainBtn)
+		trainSection.appendChild(trainControls)
 
 		const render = () => {
 			const pb = getPlacedAt(x, y)
@@ -114,10 +110,12 @@ export const buildingPage = (body: HTMLElement, x: number, y: number) => {
 			}
 			nameRow.textContent = `Name: ${pb.building.name}`
 			levelRow.textContent = `Level: ${pb.level}`
+			const originX = pb.origin.x
+			const originY = pb.origin.y
 			const q = getBuildQueue().find(
 				(i) =>
-					i.origin.x === x &&
-					i.origin.y === y &&
+					i.origin.x === originX &&
+					i.origin.y === originY &&
 					i.status === "building",
 			)
 			if (q) {
@@ -136,12 +134,66 @@ export const buildingPage = (body: HTMLElement, x: number, y: number) => {
 				upgrade.disabled = false
 			}
 
-			if (/barrack/i.test(pb.building.name)) {
+			// Show training UI if any unit is trainable here
+			let specs = trainablesForBuilding(pb.building.name)
+			// Fallback for classic Barrack => Soldier if metadata is missing/mismatched
+			if (specs.length === 0 && /barrack/i.test(pb.building.name)) {
+				const soldier = findUnitSpec("soldier")
+				if (soldier) specs = [soldier]
+			}
+			if (specs.length) {
 				trainSection.style.display = "grid"
+				// Render available unit controls (with amount input) only once
+				if (trainControls.childElementCount === 0) {
+					specs.forEach((spec) => {
+						const row = document.createElement("div")
+						row.style.display = "grid"
+						row.style.gridTemplateColumns = "1fr auto auto"
+						row.style.gap = "8px"
+
+						const label = document.createElement("div")
+						label.textContent = spec.name
+						label.style.alignSelf = "center"
+
+						const input = document.createElement("input")
+						input.type = "number"
+						input.min = "1"
+						input.value = "1"
+						input.style.width = "80px"
+						input.style.padding = "6px 8px"
+						input.style.border = "1px solid var(--border)"
+						input.style.background = "var(--button-bg)"
+						input.style.color = "var(--fg)"
+						input.style.borderRadius = "6px"
+
+						const btn = document.createElement("button")
+						btn.textContent = `Train`
+						btn.style.padding = "8px 12px"
+						btn.style.border = "1px solid var(--border)"
+						btn.style.background = "var(--button-bg)"
+						btn.style.color = "var(--fg)"
+						btn.style.borderRadius = "6px"
+						btn.style.cursor = "pointer"
+						btn.onclick = () => {
+							const qty = Math.max(
+								1,
+								Math.floor(parseInt(input.value || "1", 10)),
+							)
+							requestTrainAt(x, y, spec.id, qty)
+							render()
+						}
+
+						row.appendChild(label)
+						row.appendChild(input)
+						row.appendChild(btn)
+						trainControls.appendChild(row)
+					})
+				}
+
 				const tq = getTrainQueue().find(
 					(i) =>
-						i.origin.x === x &&
-						i.origin.y === y &&
+						i.origin.x === originX &&
+						i.origin.y === originY &&
 						i.status === "training",
 				)
 				if (tq) {
@@ -156,11 +208,26 @@ export const buildingPage = (body: HTMLElement, x: number, y: number) => {
 					trainStatus.textContent = `Training (${fmtTimeLeft(
 						tq.finishAt - Date.now(),
 					)})`
-					trainBtn.disabled = true
+					// Disable all controls while training
+					Array.from(
+						trainControls.querySelectorAll("button,input"),
+					).forEach(
+						(el) =>
+							((
+								el as HTMLButtonElement | HTMLInputElement
+							).disabled = true),
+					)
 				} else {
 					trainBar.style.width = "0%"
 					trainStatus.textContent = "Idle"
-					trainBtn.disabled = false
+					Array.from(
+						trainControls.querySelectorAll("button,input"),
+					).forEach(
+						(el) =>
+							((
+								el as HTMLButtonElement | HTMLInputElement
+							).disabled = false),
+					)
 				}
 			} else {
 				trainSection.style.display = "none"
@@ -186,6 +253,8 @@ export const buildingPage = (body: HTMLElement, x: number, y: number) => {
 		const unb = onBuildingsChange(() => render())
 		const unt = onTrainQueueChange(() => render())
 		render()
+		// Periodically update progress bars/countdowns while on this page
+		const interval = setInterval(render, 250)
 
 		window.addEventListener(
 			"popstate",
@@ -193,6 +262,7 @@ export const buildingPage = (body: HTMLElement, x: number, y: number) => {
 				unq()
 				unb()
 				unt()
+				clearInterval(interval)
 			},
 			{ once: true },
 		)
