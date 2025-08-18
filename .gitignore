@@ -3,3 +3,4 @@ data
 *.xcuserstate
 target
 node_modules
+*.sqlite*
