@@ -6,7 +6,7 @@ let _db: Database | null = null
 
 const init = () => {
 	if (_db) return _db
-	_db = new Database("server/data.sqlite", { create: true })
+	_db = new Database("server/darkforest.sqlite", { create: true })
 	_db.exec("PRAGMA journal_mode=WAL;")
 	_db.exec("PRAGMA foreign_keys=ON;")
 	migrate(_db)
