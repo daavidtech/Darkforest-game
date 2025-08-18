@@ -11,6 +11,21 @@ export type BuildQueueItem = {
 	action: "build" | "upgrade"
 }
 
+export type Unit = {
+	id: string
+	type: string
+	origin: { x: number; y: number }
+}
+
+export type TrainQueueItem = {
+	id: string
+	unit: string
+	origin: { x: number; y: number }
+	startedAt: number
+	finishAt: number
+	status: "training" | "completed"
+}
+
 const et = new EventTarget()
 
 export type Resources = { wood: number; iron: number; food: number }
@@ -25,6 +40,8 @@ const state = {
 		level: number
 		owner: "self" | "enemy"
 	}[],
+	trainQueue: [] as TrainQueueItem[],
+	units: [] as Unit[],
 }
 
 const emit = () => {
@@ -177,4 +194,90 @@ export const requestUpgradeAt = (x: number, y: number) => {
 	)
 	if (inProgress) return inProgress
 	return enqueueBuild(pb.building, pb.origin, "upgrade")
+}
+
+// Unit training
+const emitTrainQueue = () => {
+	et.dispatchEvent(
+		new CustomEvent("train-queue", { detail: getTrainQueue() }),
+	)
+}
+
+const emitUnits = () => {
+	et.dispatchEvent(new CustomEvent("units", { detail: getUnits() }))
+}
+
+export const getTrainQueue = () => state.trainQueue.slice()
+
+export const onTrainQueueChange = (cb: (items: TrainQueueItem[]) => void) => {
+	const handler = (e: Event) =>
+		cb((e as CustomEvent).detail as TrainQueueItem[])
+	et.addEventListener("train-queue", handler)
+	cb(getTrainQueue())
+	return () => et.removeEventListener("train-queue", handler)
+}
+
+export const getUnits = () => state.units.slice()
+
+export const onUnitsChange = (cb: (items: Unit[]) => void) => {
+	const handler = (e: Event) => cb((e as CustomEvent).detail as Unit[])
+	et.addEventListener("units", handler)
+	cb(getUnits())
+	return () => et.removeEventListener("units", handler)
+}
+
+const durationForUnit = (u: string) => {
+	if (/soldier/i.test(u)) return 4000
+	return 6000
+}
+
+export const enqueueTraining = (
+	unit: string,
+	origin: { x: number; y: number },
+) => {
+	const now = Date.now()
+	const dur = durationForUnit(unit)
+	const item: TrainQueueItem = {
+		id: `${unit}-${origin.x}-${origin.y}-${now}`,
+		unit,
+		origin,
+		startedAt: now,
+		finishAt: now + dur,
+		status: "training",
+	}
+	state.trainQueue.push(item)
+	// simple demo cost
+	state.resources.wood = Math.max(0, state.resources.wood - 50)
+	emitResources()
+	emitTrainQueue()
+
+	const remaining = item.finishAt - Date.now()
+	setTimeout(
+		() => {
+			const it = state.trainQueue.find((q) => q.id === item.id)
+			if (it && it.status === "training") {
+				it.status = "completed"
+				state.units.push({
+					id: `unit-${Date.now()}`,
+					type: unit,
+					origin,
+				})
+				emitTrainQueue()
+				emitUnits()
+			}
+		},
+		Math.max(0, remaining),
+	)
+
+	return item
+}
+
+export const requestTrainAt = (x: number, y: number, unit: string) => {
+	const pb = getPlacedAt(x, y)
+	if (!pb) return null
+	const inProgress = state.trainQueue.find(
+		(q) => q.origin.x === x && q.origin.y === y && q.status === "training",
+	)
+	if (inProgress) return inProgress
+	return enqueueTraining(unit, pb.origin)
 }
