@@ -2,7 +2,7 @@ import { navigate } from "./router"
 import { ThemeSwitch } from "./theme"
 import { getUser, clearToken, setUser } from "./auth"
 
-export type RouteKey = "overview" | "map" | "resources" | "login"
+export type RouteKey = "overview" | "map" | "resources" | "units" | "login"
 
 const NavLink = (label: string, path: string, active: boolean) => {
 	const a = document.createElement("button")
@@ -50,6 +50,7 @@ export const NavBar = (active: RouteKey) => {
 	if (current) {
 		center.appendChild(NavLink("Overview", "/", active === "overview"))
 		center.appendChild(NavLink("Map", "/map", active === "map"))
+		center.appendChild(NavLink("Units", "/units", active === "units"))
 		center.appendChild(
 			NavLink("Resources", "/resources", active === "resources"),
 		)

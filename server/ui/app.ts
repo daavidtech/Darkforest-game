@@ -7,6 +7,7 @@ import { applyThemeFromStorage } from "./theme"
 import { refreshUser, getUser } from "./auth"
 import { loadResourceRates } from "./state"
 import { buildingPage } from "./building"
+import { unitListPage } from "./unitlist"
 
 window.onload = () => {
 	applyThemeFromStorage()
@@ -37,6 +38,7 @@ window.onload = () => {
 		"/map": requireAuth(() => mapPage(body)),
 		"/login": () => loginPage(body),
 		"/resources": requireAuth(() => resourcesPage(body)),
+		"/units": requireAuth(() => unitListPage(body)),
 		"/building/:x/:y": (params: any) => {
 			const user = getUser()
 			if (!user) return navigate("/login")

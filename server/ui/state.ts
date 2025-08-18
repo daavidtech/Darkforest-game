@@ -1,4 +1,5 @@
 import type { Building } from "./buildinglist"
+import { findUnitSpec } from "./units-meta.ts"
 import { fetchWithAuth } from "./auth"
 
 export type BuildQueueItem = {
@@ -9,6 +10,22 @@ export type BuildQueueItem = {
 	finishAt: number
 	status: "building" | "completed"
 	action: "build" | "upgrade"
+}
+
+export type Unit = {
+	id: string
+	type: string
+	origin: { x: number; y: number }
+}
+
+export type TrainQueueItem = {
+	id: string
+	unit: string
+	origin: { x: number; y: number }
+	startedAt: number
+	finishAt: number
+	status: "training" | "completed"
+	quantity: number
 }
 
 const et = new EventTarget()
@@ -25,6 +42,8 @@ const state = {
 		level: number
 		owner: "self" | "enemy"
 	}[],
+	trainQueue: [] as TrainQueueItem[],
+	units: [] as Unit[],
 }
 
 const emit = () => {
@@ -151,8 +170,14 @@ export const addPlacedBuilding = (
 }
 
 export const getPlacedBuildings = () => state.buildings.slice()
-export const getPlacedAt = (x: number, y: number) =>
-	state.buildings.find((b) => b.origin.x === x && b.origin.y === y) || null
+export const getPlacedAt = (x: number, y: number) => {
+	const found = state.buildings.find((b) =>
+		b.building.shape.some(
+			(p) => b.origin.x + p.x === x && b.origin.y + p.y === y,
+		),
+	)
+	return found || null
+}
 
 const emitBuildings = () => {
 	et.dispatchEvent(
@@ -177,4 +202,122 @@ export const requestUpgradeAt = (x: number, y: number) => {
 	)
 	if (inProgress) return inProgress
 	return enqueueBuild(pb.building, pb.origin, "upgrade")
+}
+
+// Unit training
+const emitTrainQueue = () => {
+	et.dispatchEvent(
+		new CustomEvent("train-queue", { detail: getTrainQueue() }),
+	)
+}
+
+const emitUnits = () => {
+	et.dispatchEvent(new CustomEvent("units", { detail: getUnits() }))
+}
+
+export const getTrainQueue = () => state.trainQueue.slice()
+
+export const onTrainQueueChange = (cb: (items: TrainQueueItem[]) => void) => {
+	const handler = (e: Event) =>
+		cb((e as CustomEvent).detail as TrainQueueItem[])
+	et.addEventListener("train-queue", handler)
+	cb(getTrainQueue())
+	return () => et.removeEventListener("train-queue", handler)
+}
+
+export const getUnits = () => state.units.slice()
+
+export const onUnitsChange = (cb: (items: Unit[]) => void) => {
+	const handler = (e: Event) => cb((e as CustomEvent).detail as Unit[])
+	et.addEventListener("units", handler)
+	cb(getUnits())
+	return () => et.removeEventListener("units", handler)
+}
+
+const durationForUnit = (u: string) => {
+	const spec = findUnitSpec(u)
+	if (spec) return spec.trainTimeMs
+	if (/soldier/i.test(u)) return 4000
+	return 6000
+}
+
+export const enqueueTraining = (
+	unit: string,
+	origin: { x: number; y: number },
+	quantity = 1,
+) => {
+	const now = Date.now()
+	const q = Math.max(1, Math.floor(quantity))
+	const dur = durationForUnit(unit) * q
+	const item: TrainQueueItem = {
+		id: `${unit}-${origin.x}-${origin.y}-${now}`,
+		unit,
+		origin,
+		startedAt: now,
+		finishAt: now + dur,
+		status: "training",
+		quantity: q,
+	}
+	state.trainQueue.push(item)
+	// Apply cost from metadata if available (simple demo: clamp to 0)
+	const spec = findUnitSpec(unit)
+	if (spec) {
+		if (spec.cost.wood)
+			state.resources.wood = Math.max(
+				0,
+				state.resources.wood - q * (spec.cost.wood ?? 0),
+			)
+		if (spec.cost.iron)
+			state.resources.iron = Math.max(
+				0,
+				state.resources.iron - q * (spec.cost.iron ?? 0),
+			)
+		if (spec.cost.food)
+			state.resources.food = Math.max(
+				0,
+				state.resources.food - q * (spec.cost.food ?? 0),
+			)
+	} else {
+		// fallback demo cost for unknown units
+		state.resources.wood = Math.max(0, state.resources.wood - 50 * q)
+	}
+	emitResources()
+	emitTrainQueue()
+
+	const remaining = item.finishAt - Date.now()
+	setTimeout(
+		() => {
+			const it = state.trainQueue.find((q) => q.id === item.id)
+			if (it && it.status === "training") {
+				it.status = "completed"
+				for (let i = 0; i < item.quantity; i++) {
+					state.units.push({
+						id: `unit-${Date.now()}-${i}`,
+						type: unit,
+						origin,
+					})
+				}
+				emitTrainQueue()
+				emitUnits()
+			}
+		},
+		Math.max(0, remaining),
+	)
+
+	return item
+}
+
+export const requestTrainAt = (
+	x: number,
+	y: number,
+	unit: string,
+	quantity = 1,
+) => {
+	const pb = getPlacedAt(x, y)
+	if (!pb) return null
+	const inProgress = state.trainQueue.find(
+		(q) => q.origin.x === x && q.origin.y === y && q.status === "training",
+	)
+	if (inProgress) return inProgress
+	return enqueueTraining(unit, pb.origin, quantity)
 }
