@@ -1,4 +1,4 @@
-import type { Building } from "./buildinglist"
+import { allBuildings, type Building } from "./buildinglist"
 import { findUnitSpec } from "./units-meta.ts"
 import { fetchWithAuth } from "./auth"
 
@@ -106,6 +106,7 @@ export const enqueueBuild = (
 					if (pb) {
 						pb.level += 1
 						emitBuildings()
+						if (pb.owner === "self") saveBuilding(pb)
 					}
 				}
 			}
@@ -155,6 +156,82 @@ export const loadResourceRates = async () => {
 	} catch {}
 }
 
+export const loadBuildings = async () => {
+	try {
+		const res = await fetchWithAuth("/api/buildings")
+		if (!res.ok) return
+		const data = await res.json()
+		const items = (data.buildings as any[]) || []
+		state.buildings = items
+			.map((b) => {
+				const def = allBuildings.find((bb) => bb.name === b.name)
+				if (!def) return null
+				return {
+					id: b.id as string,
+					building: def,
+					origin: { x: b.x as number, y: b.y as number },
+					level: b.level as number,
+					owner: b.owner as "self" | "enemy",
+				}
+			})
+			.filter(Boolean)
+		emitBuildings()
+	} catch {}
+}
+
+const saveBuilding = async (b: {
+	id: string
+	building: Building
+	origin: { x: number; y: number }
+	level: number
+	owner: "self" | "enemy"
+}) => {
+	try {
+		await fetchWithAuth("/api/buildings", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({
+				id: b.id,
+				name: b.building.name,
+				x: b.origin.x,
+				y: b.origin.y,
+				level: b.level,
+				owner: b.owner,
+			}),
+		})
+	} catch {}
+}
+
+export const loadUnits = async () => {
+	try {
+		const res = await fetchWithAuth("/api/units")
+		if (!res.ok) return
+		const data = await res.json()
+		const items = (data.units as any[]) || []
+		state.units = items.map((u) => ({
+			id: u.id as string,
+			type: u.type as string,
+			origin: { x: u.x as number, y: u.y as number },
+		}))
+		emitUnits()
+	} catch {}
+}
+
+const saveUnit = async (u: Unit) => {
+	try {
+		await fetchWithAuth("/api/units", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({
+				id: u.id,
+				type: u.type,
+				x: u.origin.x,
+				y: u.origin.y,
+			}),
+		})
+	} catch {}
+}
+
 // Buildings registry helpers
 export const addPlacedBuilding = (
 	building: Building,
@@ -164,8 +241,10 @@ export const addPlacedBuilding = (
 	const id = `${building.name}-${origin.x}-${origin.y}`
 	const exists = state.buildings.find((b) => b.id === id)
 	if (!exists) {
-		state.buildings.push({ id, building, origin, level: 1, owner })
+		const entry = { id, building, origin, level: 1, owner }
+		state.buildings.push(entry)
 		emitBuildings()
+		if (owner === "self") saveBuilding(entry)
 	}
 }
 
@@ -291,11 +370,13 @@ export const enqueueTraining = (
 			if (it && it.status === "training") {
 				it.status = "completed"
 				for (let i = 0; i < item.quantity; i++) {
-					state.units.push({
+					const u = {
 						id: `unit-${Date.now()}-${i}`,
 						type: unit,
 						origin,
-					})
+					}
+					state.units.push(u)
+					saveUnit(u)
 				}
 				emitTrainQueue()
 				emitUnits()

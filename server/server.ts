@@ -4,14 +4,6 @@ import { db } from "./db"
 
 db.init()
 
-// Demo users with per-user resource rates
-type Rates = { wood: number; iron: number; food: number }
-const users: Record<string, { password: string; rates: Rates }> = {
-	admin: { password: "password", rates: { wood: 1, iron: 1, food: 1 } },
-	alice: { password: "alicepass", rates: { wood: 2, iron: 0.6, food: 1.2 } },
-	bob: { password: "bobpass", rates: { wood: 0.7, iron: 2.2, food: 1.5 } },
-}
-
 type JWTPayload = Record<string, any>
 
 const json = (data: any, init: ResponseInit = {}) =>
@@ -58,18 +50,20 @@ Bun.serve({
 		"/api/login": methodRoutes({
 			POST: async (req) => {
 				const { username, password } = await req.json()
-				const u = db.getUser(username)
+				const u = db.getUserByUsername(username)
 				if (u && u.password === password) {
-					const token = await createJWT({ sub: username })
+					const token = await createJWT({ sub: u.id })
 					return json({ token })
 				}
 				return json({ error: "Invalid credentials" }, { status: 401 })
 			},
 		}),
 		"/api/me": methodRoutes({
-			GET: withAuth(async (_req, payload) =>
-				json({ user: { username: payload.sub } }),
-			),
+			GET: withAuth(async (_req, payload) => {
+				const u = db.getUserById(payload.sub as string)
+				if (!u) return json({ user: null }, { status: 404 })
+				return json({ user: { id: u.id, username: u.username } })
+			}),
 		}),
 		"/api/rates": methodRoutes({
 			GET: withAuth(async (_req, payload) => {
@@ -77,6 +71,28 @@ Bun.serve({
 				if (!rates)
 					return json({ rates: { wood: 1, iron: 1, food: 1 } })
 				return json({ rates })
+			}),
+		}),
+		"/api/buildings": methodRoutes({
+			GET: withAuth((_req, payload) => {
+				const buildings = db.getUserBuildings(payload.sub as string)
+				return json({ buildings })
+			}),
+			POST: withAuth(async (req, payload) => {
+				const b = (await req.json()) as any
+				db.upsertUserBuilding(payload.sub as string, b)
+				return json({ success: true })
+			}),
+		}),
+		"/api/units": methodRoutes({
+			GET: withAuth((_req, payload) => {
+				const units = db.getUserUnits(payload.sub as string)
+				return json({ units })
+			}),
+			POST: withAuth(async (req, payload) => {
+				const u = (await req.json()) as any
+				db.upsertUserUnit(payload.sub as string, u)
+				return json({ success: true })
 			}),
 		}),
 		"/*": index,
