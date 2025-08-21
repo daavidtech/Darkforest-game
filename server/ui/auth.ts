@@ -1,7 +1,7 @@
 const TOKEN_KEY = "df_token"
 const USER_KEY = "df_user"
 
-export type User = { username: string }
+export type User = { id: string; username: string }
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)
 export const setToken = (t: string) => localStorage.setItem(TOKEN_KEY, t)

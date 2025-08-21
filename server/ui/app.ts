@@ -5,14 +5,18 @@ import { loginPage } from "./login"
 import { resourcesPage } from "./resources"
 import { applyThemeFromStorage } from "./theme"
 import { refreshUser, getUser } from "./auth"
-import { loadResourceRates } from "./state"
+import { loadResourceRates, loadBuildings, loadUnits } from "./state"
 import { buildingPage } from "./building"
 import { unitListPage } from "./unitlist"
 
 window.onload = () => {
 	applyThemeFromStorage()
 	refreshUser()
-		.then(() => loadResourceRates())
+		.then(() => {
+			loadResourceRates()
+			loadBuildings()
+			loadUnits()
+		})
 		.catch(() => {})
 	const body = document.querySelector("body")
 	if (!body) {
